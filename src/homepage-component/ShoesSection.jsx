@@ -1,0 +1,49 @@
+import React from 'react';
+import Card from '../components/Card';
+import Shoe1 from '../assets/Shoes/AIR FORCE 1 07 - Trainers - black.webp'
+import Shoe2 from '../assets/Shoes/AIR MONARCH IV - Training shoe.webp';
+import Shoe3 from '../assets/Shoes/RUN FOUR - Trainers.webp';
+import Shoe4 from '../assets/Shoes/SUPERSTAR II  - Trainers.webp';
+import Button2 from '../components/Button2';
+import { Link } from 'react-router';
+
+
+const ShoesSection = () => {
+  return (
+    <div className="h-auto w-full flex flex-col gap-y-6 items-center justify-center pt-10 ">
+      <div className="flex flex-col gap-y-2 items-center w-full">
+        <h1 className="text-xl md:text-3xl text-olive font-semibold text-center">
+          Premium Shoes Collections
+        </h1>
+        <div className="bg-gray-800 w-[80%] md:w-[70%] lg:w-[50%] h-0.5"></div>
+      </div>
+      <div className="w-full h-auto grid grid-cols-2  md:grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-4  md:gap-x-10 md:gap-y-5 items-center px-2 md:px-5">
+        <Card
+          bgImg={Shoe1}
+          title={'BDT 2200TK'}
+          subTitle={'AIR FORCE 107 -black'}
+        />
+        <Card
+          bgImg={Shoe2}
+          title={'BDT 2300TK'}
+          subTitle={'AIR MONARCH IV -shoe '}
+        />
+        <Card
+          bgImg={Shoe3}
+          title={'BDT 2100TK'}
+          subTitle={'RUN FOUR - Trainers '}
+        />
+        <Card
+          bgImg={Shoe4}
+          title={'BDT 2500TK'}
+          subTitle={'SUPERSTAR II -Trainers '}
+        />
+      </div>
+      <Link to="/shoes">
+        <Button2 btnText={'View All'} />
+      </Link>
+    </div>
+  );
+};
+
+export default ShoesSection;
