@@ -2,18 +2,20 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import { RouterProvider } from 'react-router';
 import router from './router/router';
-
-// ⭐ AOS Import
+import { CartProvider } from './context/CartContext';
+import { ToastProvider } from './context/ToastContext';
+import { WishlistProvider } from './context/WishlistContext';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-// ⭐ AOS Initialize
-AOS.init({
-  duration: 800, // animation duration
-  easing: 'ease-in-out', // smooth animation
-  once: false, // scroll এ বারবার animation চাইলে false রাখো
-});
+AOS.init({ duration: 700, easing: 'ease-out', once: true });
 
 createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router}></RouterProvider>
+  <CartProvider>
+    <WishlistProvider>
+      <ToastProvider>
+        <RouterProvider router={router} />
+      </ToastProvider>
+    </WishlistProvider>
+  </CartProvider>
 );

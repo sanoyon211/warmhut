@@ -1,132 +1,37 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { BsFilterLeft } from 'react-icons/bs';
-import { Link, useLocation } from 'react-router';
-import AllWallet from '../WalletComponent/AllWallet';
-import BlackWallet from '../WalletComponent/BlackWallet';
-import BrownWallet from '../WalletComponent/BrownWallet';
+import React, { useState } from 'react';
+import ProductPageLayout from '../components/ProductPageLayout';
+import ProductGrid from '../components/ProductGrid';
+
+import Wallet1 from '../assets/Wallet/ETON AND COIN SET - Wallet - black.webp';
+import Wallet2 from '../assets/Wallet/IGOR - Wallet - black.webp';
+import Wallet3 from '../assets/Wallet/RE-LOCK LARGE ZIP AROUND - Wallet - black.webp';
+import Wallet4 from '../assets/Wallet/TIMILUS - Wallet - black.webp';
+import Wallet5 from '../assets/Wallet/Quiksilver -Brown.webp';
+import Wallet6 from '../assets/Wallet/Anna Field -Brown.webp';
+
+const allWallets = [
+  { img: Wallet1, name: 'Eton & Coin Set Wallet (Black)', price: 'BDT 450TK', color: 'black' },
+  { img: Wallet2, name: 'IGOR Wallet (Black)', price: 'BDT 500TK', color: 'black' },
+  { img: Wallet3, name: 'RE-LOCK Large Zip Around (Black)', price: 'BDT 550TK', color: 'black' },
+  { img: Wallet4, name: 'TIMILUS Wallet (Black)', price: 'BDT 400TK', color: 'black' },
+  { img: Wallet5, name: 'Quiksilver Wallet (Brown)', price: 'BDT 400TK', color: 'brown' },
+  { img: Wallet6, name: 'Anna Field Wallet (Brown)', price: 'BDT 400TK', color: 'brown' },
+];
+
+const filters = [
+  { value: 'all', label: 'All Wallets', count: 6 },
+  { value: 'black', label: 'Black', count: 4 },
+  { value: 'brown', label: 'Brown', count: 2 },
+];
 
 const Wallet = () => {
-  const [openFilter, setopenFilter] = useState(false);
-  const [color, setcolor] = useState('wallet');
-
-  const changeBlack = () => {
-    setcolor('black');
-  };
-
-  const changeBrown = () => {
-    setcolor('brown');
-  };
-  const changeAll = () => {
-    setcolor('all');
-  };
-
-  const menuRef = useRef(null);
-  const location = useLocation();
-
-  // ⭐ 1. Outside Click Hide Menu
-  useEffect(() => {
-    const handleClickOutside = event => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setopenFilter(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // ⭐ 2. Route change হলে menu auto-close
-  useEffect(() => {
-    setopenFilter(false);
-  }, [location.pathname]);
-
-  console.log(setopenFilter);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const filtered = activeFilter === 'all' ? allWallets : allWallets.filter(w => w.color === activeFilter);
 
   return (
-    <div className="max-w-[1320px] mx-auto flex flex-col lg:flex-row lg:justify-between gap-x-6 gap-y-4">
-      <div className="lg:max-w-[300px] w-full h-auto  mt-25 hidden lg:block">
-        <div className="bg-white rounded-xl lg:sticky top-15 shadow-2xl border border-gray-300 mb-5">
-          <div className="flex flex-row gap-x-4  z-100 pl-5 py-5">
-            <h1 className="h-auto  bg-gray-100 p-3 rounded-lg border border-olive inline-block mb-auto text-xl font-semibold text-olive">
-              Catagory :
-            </h1>
-            <div className="flex flex-col gap-y-4 bg-gray-100 p-7 rounded-lg border border-olive">
-              <button
-                onClick={changeAll}
-                className={`${
-                  color === 'all' ? 'text-olive' : 'text-gray-800'
-                } font-bold text-base cursor-pointer`}
-              >
-                All
-              </button>
-              <button
-                onClick={changeBlack}
-                className={`${
-                  color === 'black' ? 'text-olive' : 'text-gray-800'
-                } font-bold text-base cursor-pointer`}
-              >
-                Black
-              </button>
-
-              <button
-                onClick={changeBrown}
-                className={`${
-                  color === 'brown' ? 'text-olive' : 'text-gray-800'
-                } font-bold text-base cursor-pointer`}
-              >
-                Brown
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="relative pl-3 pt-3">
-        <div
-          onClick={() => setopenFilter(!openFilter)}
-          className="inline-block"
-        >
-          <span className="flex flex-row gap-x-1  items-center lg:hidden text-2xl text-gray-800 ">
-            <h3>Filter</h3> <BsFilterLeft className="w-6 h-6 text-gray-800" />
-          </span>
-        </div>
-        {openFilter && (
-          <div
-            ref={menuRef}
-            className="lg:hidden bg-gray-100 py-4 px-10 space-y-4 animate-slideDown absolute top-0 right-0 flex flex-col gap-y-5"
-          >
-            <button
-              onClick={changeAll}
-              className={`${
-                color === 'all' ? 'text-olive' : 'text-gray-800'
-              } font-bold text-base cursor-pointer`}
-            >
-              All
-            </button>
-            <button
-              onClick={changeBlack}
-              className={`${
-                color === 'black' ? 'text-olive' : 'text-gray-800'
-              } font-bold text-base cursor-pointer`}
-            >
-              Black
-            </button>
-
-            <button
-              onClick={changeBrown}
-              className={`${
-                color === 'brown' ? 'text-olive' : 'text-gray-800'
-              } font-bold text-base cursor-pointer`}
-            >
-              Brown
-            </button>
-          </div>
-        )}
-      </div>
-      {color === 'all' ? <AllWallet /> : null}
-      {color === 'black' ? <BlackWallet /> : null}
-      {color === 'brown' ? <BrownWallet /> : null}
-      {color === 'wallet' ? <AllWallet /> : null}
-    </div>
+    <ProductPageLayout title="Premium Wallets" filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter}>
+      <ProductGrid products={filtered} />
+    </ProductPageLayout>
   );
 };
 

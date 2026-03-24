@@ -1,87 +1,82 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [showPass, setShowPass] = useState(false);
+  const [form, setForm] = useState({ email: '', password: '' });
 
   const handleSubmit = e => {
     e.preventDefault();
-    // এখানে আপনি validation বা API call করতে পারেন
-    navigate('/verify'); // submit হলে verify page এ redirect
+    navigate('/');
   };
 
   return (
-    <section className="flex items-center justify-center py-20 bg-gray-100">
-      <div className="w-full  max-w-[90%] lg:max-w-[35%] bg-white p-6 rounded-[30px] shadow-lg">
-        <h2 className="text-xl md:text-2xl font-bold text-center text-gray-800 mb-6">
-          Log in
-        </h2>
-
-        {/* Signup Link */}
-        <p className="mt-4 text-center text-[#666666] text-sm md:text-base">
-          Don't have an account?{' '}
-          <Link to='/signup' className="text-olive hover:underline">
-            Sign up
-          </Link>
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          {/* Email */}
-          <div className="mb-4">
-            <label
-              className="block  text-gray-600  font-normal  text-sm md:text-base leading-normal"
-              htmlFor="email"
-            >
-              Email Address or username
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full px-3 py-2 border border-olive bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-olive text-[#7B7B7B]"
-              placeholder="Enter your email"
-              required
-            />
+    <section className="min-h-[85vh] flex items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-10">
+          <div className="text-center mb-8">
+            <h1 className="font-black text-2xl text-gray-900 mb-1">Welcome Back 👋</h1>
+            <p className="text-gray-400 text-sm">Sign in to your WarmHut account</p>
           </div>
 
-          {/* Password */}
-          <div className="mb-4">
-            <label
-              className="block  text-gray-600  font-normal  text-sm md:text-base leading-normal"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full px-3 py-2 border border-olive bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-olive text-[#7B7B7B]"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
+              <div className="relative">
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  placeholder="you@example.com"
+                  className="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-2xl text-sm text-gray-800 focus:outline-none focus:border-olive focus:ring-2 focus:ring-olive/10 transition-all bg-gray-50"
+                  required
+                />
+              </div>
+            </div>
 
-          {/* Forgot Password */}
-          <div className="flex justify-between items-center mb-4">
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="text-gray-700 text-sm md:text-base">Remember me</span>
-            </label>
-            <Link
-              to="/create-new"
-              className="text-sm md:text-base text-olive hover:underline"
-            >
-              Forgot Password?
-            </Link>
-          </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type={showPass ? 'text' : 'password'}
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  placeholder="Enter your password"
+                  className="w-full pl-11 pr-12 py-3.5 border border-gray-200 rounded-2xl text-sm text-gray-800 focus:outline-none focus:border-olive focus:ring-2 focus:ring-olive/10 transition-all bg-gray-50"
+                  required
+                />
+                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  {showPass ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
 
-          {/* Login Button */}
-          <button
-            type="submit"
-            className="w-full  bg-olive text-white py-2 rounded-4xl hover:bg-gray-200 transition duration-500 ease-in-out cursor-pointer hover:text-gray-800"
-          >
-            Login
-          </button>
-        </form>
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-x-2 cursor-pointer">
+                <input type="checkbox" className="accent-olive" />
+                <span className="text-gray-600">Remember me</span>
+              </label>
+              <Link to="/verify" className="text-olive font-semibold hover:underline">Forgot Password?</Link>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-4 bg-olive text-white font-bold rounded-2xl hover:bg-gray-900 transition-colors duration-200 shadow-lg shadow-olive/20 text-sm mt-2"
+            >
+              Sign In →
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-olive font-bold hover:underline">Sign Up</Link>
+          </p>
+        </div>
       </div>
     </section>
   );

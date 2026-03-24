@@ -1,20 +1,22 @@
-import React from 'react'
-import Navbar from '../NavFoot/Navbar'
-import { Outlet } from 'react-router'
-import Footer from '../NavFoot/Footer'
-import ScrollToTop from '../ScrollToTop'
+import React from 'react';
+import Navbar from '../NavFoot/Navbar';
+import Footer from '../NavFoot/Footer';
+import { Outlet } from 'react-router';
+import CartDrawer from '../components/CartDrawer';
+import { BackToTop } from '../components/Utils';
+import ScrollToTop from '../ScrollToTop';
 
-
-
-const Layout = () => {
-  return (
-    <>
-      <ScrollToTop />
-      <Navbar />
+const Layout = () => (
+  <>
+    <ScrollToTop />
+    <Navbar />
+    <CartDrawer />
+    <BackToTop />
+    <main>
       <Outlet />
-      <Footer />
-    </>
-  );
-}
+    </main>
+    <Footer />
+  </>
+);
 
-export default Layout
+export default Layout;

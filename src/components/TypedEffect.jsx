@@ -8,23 +8,22 @@ const TypedEffect = () => {
     const typed = new Typed(typedElement.current, {
       strings: [
         'Welcome to WarmHut!',
-        'Best Winter Clothes Collection!',
-        'Premium Quality Guaranteed!',
+        'Premium Winter Collections!',
+        'Free Delivery on 1000TK+!',
+        'Shop Smart. Stay Warm.',
       ],
-      typeSpeed: 80,
-      backSpeed: 40,
+      typeSpeed: 70,
+      backSpeed: 35,
       loop: true,
+      backDelay: 1800,
     });
-
-    // cleanup (component unmount)
-    return () => {
-      typed.destroy();
-    };
+    return () => typed.destroy();
   }, []);
 
   return (
-    <h2 className="text-xl md:text-4xl font-bold text-olive">
+    <h2 className="text-2xl md:text-4xl lg:text-5xl font-black text-white">
       <span ref={typedElement}></span>
+      <span className="text-olive">_</span>
     </h2>
   );
 };
