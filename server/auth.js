@@ -18,7 +18,15 @@ export const auth = betterAuth({
     database: mongodbAdapter(db, {
         usePlural: true
     }),
-    trustedOrigins: ["http://localhost:5173", process.env.FRONTEND_URL || "http://localhost:5173"],
+    logger: {
+        level: "debug"
+    },
+    trustedOrigins: [
+        "http://localhost:5173", 
+        "http://localhost:5174", 
+        "http://localhost:5175", 
+        process.env.FRONTEND_URL || "http://localhost:5173"
+    ],
     emailAndPassword: {
         enabled: true,
     },
