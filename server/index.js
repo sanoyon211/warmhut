@@ -17,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 // Mount Better Auth handler
-app.all("/api/auth/*", toNodeHandler(auth));
+app.all("/api/auth/*path", toNodeHandler(auth));
 
 // Default route for testing
 app.get("/", (req, res) => {
