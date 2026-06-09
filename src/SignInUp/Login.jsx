@@ -1,15 +1,40 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
+import { signIn } from '../lib/auth-client';
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPass, setShowPass] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/');
+    setLoading(true);
+    setError('');
+    
+    const { data, error } = await signIn.email({
+      email: form.email,
+      password: form.password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message || 'Failed to login');
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    await signIn.social({
+      provider: 'google',
+      callbackURL: '/',
+    });
   };
 
   return (
@@ -19,8 +44,14 @@ const Login = () => {
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-10">
           <div className="text-center mb-8">
             <h1 className="font-black text-2xl text-gray-900 mb-1">Welcome Back 👋</h1>
-            <p className="text-gray-400 text-sm">Sign in to your WarmHut account</p>
+            <p className="text-gray-400 text-sm">Sign in to your account</p>
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm text-center">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -66,13 +97,29 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full py-4 bg-olive text-white font-bold rounded-2xl hover:bg-gray-900 transition-colors duration-200 shadow-lg shadow-olive/20 text-sm mt-2"
+              disabled={loading}
+              className="w-full py-4 bg-olive text-white font-bold rounded-2xl hover:bg-gray-900 disabled:bg-gray-400 transition-colors duration-200 shadow-lg shadow-olive/20 text-sm mt-2 flex justify-center items-center gap-2"
             >
-              Sign In →
+              {loading ? 'Signing In...' : 'Sign In →'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <div className="my-6 flex items-center gap-4">
+            <div className="h-px bg-gray-200 flex-1"></div>
+            <span className="text-sm text-gray-400 font-medium">OR</span>
+            <div className="h-px bg-gray-200 flex-1"></div>
+          </div>
+
+          <button
+            onClick={handleGoogleLogin}
+            type="button"
+            className="w-full py-3.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 transition-colors duration-200 shadow-sm text-sm flex items-center justify-center gap-3 mb-6"
+          >
+            <FcGoogle className="w-5 h-5" />
+            Continue with Google
+          </button>
+
+          <p className="text-center text-sm text-gray-500">
             Don't have an account?{' '}
             <Link to="/signup" className="text-olive font-bold hover:underline">Sign Up</Link>
           </p>
