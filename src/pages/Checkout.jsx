@@ -34,9 +34,22 @@ const Checkout = () => {
   const discountAmount = Math.round((subtotal * discountPercent) / 100);
   const total = subtotal + delivery - discountAmount;
 
-  const [form, setForm] = useState({
-    name: '', phone: '', address: '', area: '', note: '',
+  const [form, setForm] = useState(() => {
+    // Local Address Book: Try to load from localStorage first
+    const saved = localStorage.getItem('warmhut_saved_address');
+    if (saved) {
+      try { return JSON.parse(saved); } catch(e) { /* ignore */ }
+    }
+    return {
+      name: session?.user?.name || '',
+      phone: '',
+      address: '',
+      area: '',
+      note: '',
+      email: session?.user?.email || ''
+    };
   });
+
   const [payMethod, setPayMethod] = useState('cod');
   const [placing, setPlacing] = useState(false);
   const [step, setStep] = useState(1); // 1: form, 2: success
@@ -89,6 +102,15 @@ const Checkout = () => {
 
       const result = await createOrder(orderPayload);
       
+      // Save address for future (Address Book feature)
+      localStorage.setItem('warmhut_saved_address', JSON.stringify({
+        name: form.name,
+        phone: form.phone,
+        address: form.address,
+        area: form.area,
+        email: form.email
+      }));
+
       setOrderId(result.orderId);
       setStep(2);
       if (!directProduct) clearCart();

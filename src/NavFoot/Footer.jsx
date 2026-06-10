@@ -64,8 +64,15 @@ const Footer = () => {
             <div>
               <h3 className="font-bold text-sm uppercase tracking-wider text-gray-300 mb-5">Information</h3>
               <div className="space-y-3">
-                {['About Us', 'Delivery Policy', 'Return & Refund', 'Terms & Conditions', 'Privacy Policy', 'How to Order'].map(item => (
-                  <p key={item} className="text-gray-400 text-sm hover:text-olive transition-colors cursor-pointer">{item}</p>
+                {[
+                  { label: 'FAQ', to: '/faq' },
+                  { label: 'Return & Refund Policy', to: '/return-policy' },
+                  { label: 'Delivery Policy', to: '/faq' },
+                  { label: 'Terms & Conditions', to: '#' },
+                ].map(item => (
+                  <Link key={item.label} to={item.to} className="block">
+                    <p className="text-gray-400 text-sm hover:text-olive transition-colors cursor-pointer">{item.label}</p>
+                  </Link>
                 ))}
               </div>
             </div>

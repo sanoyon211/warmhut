@@ -21,6 +21,8 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import UserDashboard from '../pages/Dashboard/UserDashboard';
 import AdminDashboard from '../pages/Dashboard/AdminDashboard';
 import SearchResults from '../pages/SearchResults';
+import FAQ from '../pages/FAQ';
+import ReturnPolicy from '../pages/ReturnPolicy';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,8 @@ const router = createBrowserRouter([
       { path: 'shoes', element: <Shoes /> },
       { path: 'offers', element: <OfferPage /> },
       { path: 'search', element: <SearchResults /> },
+      { path: 'faq', element: <FAQ /> },
+      { path: 'return-policy', element: <ReturnPolicy /> },
       { path: 'product', element: <ProductDetail /> },
       { path: 'checkout', element: <Checkout /> },
       { path: 'wishlist', element: <WishlistPage /> },
