@@ -2,6 +2,7 @@ import React from 'react';
 import BgImg from '../components/BgImg';
 import Testimonials from '../components/Testimonials';
 import Newsletter from '../components/Newsletter';
+import {
   NewArrivalsSection,
   DynamicCategorySection,
 } from '../homepage-component/HomeSections';
