@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
 import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage } from '../../lib/api';
 import { useNavigate, Link } from 'react-router';
-import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome } from 'react-icons/fi';
+import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
 
 const AdminDashboard = () => {
   const { data: session } = useSession();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'messages', 'products', 'promos'
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [orders, setOrders] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -167,10 +168,18 @@ const AdminDashboard = () => {
   const pendingOrders = orders.filter(o => o.status === 'Pending').length;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 relative">
       
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* ── Left Sidebar ── */}
-      <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col fixed left-0 top-0 shadow-2xl z-10">
+      <aside className={`fixed inset-y-0 left-0 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out w-64 bg-gray-900 text-white min-h-screen flex flex-col shadow-2xl z-50`}>
         {/* Brand Header */}
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-x-3">
@@ -255,15 +264,23 @@ const AdminDashboard = () => {
       </aside>
 
       {/* ── Main Content Area ── */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 w-full min-w-0">
         
         {/* Top Header */}
-        <header className="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <div>
-            <h2 className="text-2xl font-black text-gray-900 capitalize">{activeTab}</h2>
-            <p className="text-sm text-gray-500 mt-1">Manage your store {activeTab} and operations.</p>
+        <header className="flex justify-between items-center mb-6 md:mb-8 bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-gray-100">
+          <div className="flex items-center gap-x-3">
+            <button 
+              className="md:hidden p-2.5 bg-gray-100 rounded-xl text-gray-700 hover:bg-gray-200 transition-colors"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <FiMenu className="w-5 h-5" />
+            </button>
+            <div>
+              <h2 className="text-xl md:text-2xl font-black text-gray-900 capitalize">{activeTab}</h2>
+              <p className="hidden md:block text-sm text-gray-500 mt-1">Manage your store {activeTab} and operations.</p>
+            </div>
           </div>
-          <div className="flex items-center gap-x-4 border-l border-gray-100 pl-6">
+          <div className="flex items-center gap-x-4 border-l border-gray-100 pl-4 md:pl-6">
             <div className="text-right hidden md:block">
               <p className="text-sm font-bold text-gray-900">{session?.user?.name}</p>
               <p className="text-[10px] uppercase tracking-wider font-bold text-olive">{session?.user?.role}</p>

@@ -48,7 +48,7 @@ const BgImg = () => {
           </div>
 
           {/* Stats */}
-          <div className="flex justify-center gap-x-8 md:gap-x-12 mt-12 pt-8 border-t border-white/10 w-full max-w-2xl">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-8 mt-12 pt-8 border-t border-white/10 w-full max-w-2xl">
             {[
               { num: '500+', label: 'Premium Items' },
               { num: '10K+', label: 'Happy Customers' },
@@ -65,7 +65,7 @@ const BgImg = () => {
       </div>
 
       {/* Feature badges */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {[
           { icon: '🚚', title: 'Free Premium Delivery', sub: 'On orders above 1000TK' },
           { icon: '🔄', title: 'Hassle-Free Returns', sub: '7 days no-questions policy' },
