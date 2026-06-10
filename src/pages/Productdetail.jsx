@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useSession } from '../lib/auth-client';
+import { getProductById, addReview } from '../lib/api';
 import { AiFillHeart } from 'react-icons/ai';
-import { FiHeart, FiShoppingCart, FiArrowLeft, FiShare2, FiCheck } from 'react-icons/fi';
+import { FiHeart, FiShoppingCart, FiArrowLeft, FiShare2, FiCheck, FiUser } from 'react-icons/fi';
 import { BsStarFill, BsStarHalf, BsStar, BsShieldCheck, BsTruck, BsArrowRepeat } from 'react-icons/bs';
 import { HiMinus, HiPlus } from 'react-icons/hi';
 
@@ -14,15 +16,34 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { showToast } = useToast();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { data: session } = useSession();
 
   // Card থেকে pass করা state
-  const product = location.state?.product;
+  const initialProduct = location.state?.product;
 
+  const [product, setProduct] = useState(initialProduct);
   const [qty, setQty] = useState(1);
   const [selectedSize, setSelectedSize] = useState('M');
   const [activeTab, setActiveTab] = useState('details');
   const [zoomed, setZoomed] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+
+  // Review states
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (initialProduct?.id) {
+      getProductById(initialProduct.id).then(data => {
+        if (data) {
+          // ensure id is set
+          data.id = data._id || data.id;
+          setProduct(data);
+        }
+      });
+    }
+  }, [initialProduct]);
 
   // Product না থাকলে homepage এ redirect
   if (!product) {
@@ -68,12 +89,34 @@ const ProductDetail = () => {
     showToast('🔗 Link copied to clipboard!', 'info');
   };
 
-  // Fake reviews
-  const reviews = [
-    { name: 'Rakibul Islam', rating: 5, text: 'Excellent quality! Exactly as shown. Fast delivery.', date: '2 days ago', avatar: 'RI', color: 'bg-blue-500' },
-    { name: 'Fatema Khanam', rating: 4, text: 'Very good product. Love the color and fit.', date: '1 week ago', avatar: 'FK', color: 'bg-pink-500' },
-    { name: 'Sabbir Ahmed', rating: 5, text: 'Premium quality at a very reasonable price. Recommended!', date: '2 weeks ago', avatar: 'SA', color: 'bg-green-500' },
-  ];
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!session?.user) return showToast('Please login to review', 'error');
+    if (!reviewComment.trim()) return showToast('Please enter a comment', 'error');
+
+    setSubmittingReview(true);
+    try {
+      const newReview = await addReview(product.id, {
+        userId: session.user.id,
+        name: session.user.name,
+        rating: reviewRating,
+        comment: reviewComment
+      });
+      // Refresh product data
+      setProduct(newReview.product);
+      setReviewComment('');
+      showToast('Thank you for your review!', 'success');
+    } catch (error) {
+      showToast(error.message || 'Failed to submit review', 'error');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const reviews = product?.reviews || [];
+  const averageRating = reviews.length 
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+    : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -161,11 +204,11 @@ const ProductDetail = () => {
               <div className="flex items-center gap-x-2 mb-4">
                 <div className="flex items-center gap-x-0.5">
                   {[1,2,3,4,5].map(i => (
-                    <BsStarFill key={i} className={`w-3.5 h-3.5 ${i <= 4 ? 'text-yellow-400' : 'text-gray-200'}`} />
+                    <BsStarFill key={i} className={`w-3.5 h-3.5 ${i <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-200'}`} />
                   ))}
                 </div>
-                <span className="text-sm font-semibold text-gray-700">4.8</span>
-                <span className="text-sm text-gray-400">(24 reviews)</span>
+                <span className="text-sm font-semibold text-gray-700">{averageRating > 0 ? averageRating : 'No reviews'}</span>
+                <span className="text-sm text-gray-400">({reviews.length} reviews)</span>
               </div>
 
               {/* Price */}
@@ -349,26 +392,30 @@ const ProductDetail = () => {
               {/* Rating summary */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center gap-x-8">
                 <div className="text-center">
-                  <p className="text-5xl font-black text-gray-900">4.8</p>
+                  <p className="text-5xl font-black text-gray-900">{averageRating > 0 ? averageRating : '0.0'}</p>
                   <div className="flex gap-x-0.5 justify-center mt-1">
-                    {[1,2,3,4,5].map(i => <BsStarFill key={i} className="w-3 h-3 text-yellow-400" />)}
+                    {[1,2,3,4,5].map(i => <BsStarFill key={i} className={`w-3 h-3 ${i <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-200'}`} />)}
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">24 reviews</p>
+                  <p className="text-xs text-gray-400 mt-1">{reviews.length} reviews</p>
                 </div>
-                <div className="flex-1 space-y-1.5">
-                  {[5,4,3,2,1].map(star => (
-                    <div key={star} className="flex items-center gap-x-2">
-                      <span className="text-xs text-gray-400 w-3">{star}</span>
-                      <BsStarFill className="w-3 h-3 text-yellow-400" />
-                      <div className="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                        <div
-                          className="bg-yellow-400 h-full rounded-full"
-                          style={{ width: star === 5 ? '75%' : star === 4 ? '15%' : star === 3 ? '7%' : '3%' }}
-                        />
+                <div className="flex-1 space-y-1.5 hidden sm:block">
+                  {[5,4,3,2,1].map(star => {
+                    const count = reviews.filter(r => Math.round(r.rating) === star).length;
+                    const percent = reviews.length ? (count / reviews.length) * 100 : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-x-2">
+                        <span className="text-xs text-gray-400 w-3">{star}</span>
+                        <BsStarFill className="w-3 h-3 text-yellow-400" />
+                        <div className="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className="bg-yellow-400 h-full rounded-full transition-all"
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-400 w-6">{count}</span>
                       </div>
-                      <span className="text-xs text-gray-400 w-6">{star === 5 ? '18' : star === 4 ? '4' : star === 3 ? '2' : '0'}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -376,24 +423,73 @@ const ProductDetail = () => {
               {reviews.map((r, i) => (
                 <div key={i} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <div className="flex items-start gap-x-3">
-                    <div className={`w-10 h-10 ${r.color} text-white font-black text-sm rounded-xl flex items-center justify-center flex-shrink-0`}>
-                      {r.avatar}
+                    <div className="w-10 h-10 bg-gray-100 text-gray-500 font-black text-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                      {r.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <p className="font-bold text-gray-900 text-sm">{r.name}</p>
-                        <span className="text-xs text-gray-400">{r.date}</span>
+                        <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</span>
                       </div>
                       <div className="flex gap-x-0.5 my-1">
                         {[1,2,3,4,5].map(i => (
                           <BsStarFill key={i} className={`w-3 h-3 ${i <= r.rating ? 'text-yellow-400' : 'text-gray-200'}`} />
                         ))}
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">{r.text}</p>
+                      <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>
                     </div>
                   </div>
                 </div>
               ))}
+              
+              {/* Add Review Form */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm mt-6">
+                <h3 className="font-black text-gray-900 mb-4">Write a Review</h3>
+                {!session?.user ? (
+                  <div className="text-center py-6">
+                    <p className="text-gray-500 mb-4 text-sm">You must be logged in to post a review.</p>
+                    <Link to="/login">
+                      <button className="px-6 py-2.5 bg-olive text-white font-bold rounded-xl text-sm">Login Now</button>
+                    </Link>
+                  </div>
+                ) : (
+                  <form onSubmit={handleReviewSubmit} className="space-y-4">
+                    <div>
+                      <p className="text-sm font-bold text-gray-800 mb-2">Rating</p>
+                      <div className="flex gap-x-2">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setReviewRating(star)}
+                            className={`p-2 rounded-lg transition-colors ${reviewRating >= star ? 'bg-yellow-50' : 'hover:bg-gray-50'}`}
+                          >
+                            <BsStarFill className={`w-5 h-5 ${reviewRating >= star ? 'text-yellow-400' : 'text-gray-300'}`} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-800 mb-2">Your Review</p>
+                      <textarea
+                        rows="3"
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="What do you think about this product?"
+                        className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-olive focus:ring-1 focus:ring-olive transition-colors"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={submittingReview}
+                      className="px-6 py-3 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition-colors disabled:opacity-50"
+                    >
+                      {submittingReview ? 'Submitting...' : 'Submit Review'}
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           )}
         </div>

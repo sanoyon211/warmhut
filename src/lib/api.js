@@ -98,3 +98,30 @@ export const toggleWishlistApi = async (userId, productId) => {
     throw error;
   }
 };
+
+export const addReview = async (productId, reviewData) => {
+  try {
+    const response = await fetch(`${API_BASE}/products/${productId}/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reviewData)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to add review');
+    return data;
+  } catch (error) {
+    console.error('Error adding review:', error);
+    throw error;
+  }
+};
+
+export const getProductById = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE}/products/${id}`);
+    if (!response.ok) throw new Error('Product not found');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
+};

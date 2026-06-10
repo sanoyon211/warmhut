@@ -90,4 +90,35 @@ router.post('/', async (req, res) => {
   }
 });
 
+// @route   POST /api/products/:id/reviews
+// @desc    Add a review to a product
+// @access  Public (should be protected normally, but client provides userId)
+router.post('/:id/reviews', async (req, res) => {
+  try {
+    const { userId, name, rating, comment } = req.body;
+    
+    if (!userId || !name || !rating || !comment) {
+      return res.status(400).json({ message: 'Please provide all review fields' });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    // Check if user already reviewed
+    const alreadyReviewed = product.reviews.find(r => r.userId === userId);
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: 'You have already reviewed this product' });
+    }
+
+    const review = { userId, name, rating: Number(rating), comment };
+    product.reviews.push(review);
+    
+    await product.save();
+    res.status(201).json({ message: 'Review added', product });
+  } catch (error) {
+    console.error('Error adding review:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 export default router;
