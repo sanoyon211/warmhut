@@ -1,34 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductPageLayout from '../components/ProductPageLayout';
 import ProductGrid from '../components/ProductGrid';
-
-import Blue from '../assets/DropsholderHoodie/Washed-DropsholderHoodie-blue.jpg';
-import Autumn from '../assets/DropsholderHoodie/Washed-DropsholderHoodie-Autunm.jpg';
-import Gray from '../assets/DropsholderHoodie/Washed-DropsholderHoodie-gray.jpg';
-import Black from '../assets/DropsholderHoodie/Washed-DropsholderHoodie-black.jpg';
-
-const allDHoodies = [
-  { img: Blue, name: 'Washed Dropshoulder Hoodie (Blue)', price: 'BDT 1500TK', color: 'blue' },
-  { img: Autumn, name: 'Washed Dropshoulder Hoodie (Autumn)', price: 'BDT 1500TK', color: 'autumn' },
-  { img: Gray, name: 'Washed Dropshoulder Hoodie (Gray)', price: 'BDT 1500TK', color: 'gray' },
-  { img: Black, name: 'Washed Dropshoulder Hoodie (Black)', price: 'BDT 1500TK', color: 'black' },
-];
-
-const filters = [
-  { value: 'all', label: 'All', count: 4 },
-  { value: 'black', label: 'Black', count: 1 },
-  { value: 'blue', label: 'Blue', count: 1 },
-  { value: 'gray', label: 'Gray', count: 1 },
-  { value: 'autumn', label: 'Autumn', count: 1 },
-];
+import { fetchProducts } from '../lib/api';
 
 const DropshoulderHoodie = () => {
   const [activeFilter, setActiveFilter] = useState('all');
-  const filtered = activeFilter === 'all' ? allDHoodies : allDHoodies.filter(h => h.color === activeFilter);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      const data = await fetchProducts('DropshoulderHoodie');
+      setProducts(data);
+      setLoading(false);
+    };
+    loadProducts();
+  }, []);
+
+  const filtered = activeFilter === 'all'
+    ? products
+    : products.filter(c => c.color === activeFilter);
+
+  // Dynamically generate filters based on products
+  const filters = [
+    { value: 'all', label: 'All', count: products.length },
+    { value: 'black', label: 'Black', count: products.filter(c => c.color === 'black').length },
+    { value: 'blue', label: 'Blue', count: products.filter(c => c.color === 'blue').length },
+    { value: 'gray', label: 'Gray', count: products.filter(c => c.color === 'gray').length },
+    { value: 'autumn', label: 'Autumn', count: products.filter(c => c.color === 'autumn').length },
+  ];
 
   return (
-    <ProductPageLayout title="Dropshoulder Hoodies" filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter}>
-      <ProductGrid products={filtered} />
+    <ProductPageLayout
+      title="Dropshoulder Hoodies"
+      filters={filters}
+      activeFilter={activeFilter}
+      onFilterChange={setActiveFilter}
+    >
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <span className="w-10 h-10 border-4 border-olive/30 border-t-olive rounded-full animate-spin"></span>
+        </div>
+      ) : (
+        <ProductGrid products={filtered} />
+      )}
     </ProductPageLayout>
   );
 };

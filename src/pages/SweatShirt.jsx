@@ -1,33 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductPageLayout from '../components/ProductPageLayout';
 import ProductGrid from '../components/ProductGrid';
-
-import Jackjony from '../assets/Sweetshirt/Jack & Jonys -Sweet Shirt.webp';
-import Black from '../assets/Sweetshirt/Sweet Shirt -Black.webp';
-import Gray from '../assets/Sweetshirt/Sweet Shirt -Gray.webp';
-import LightGray from '../assets/Sweetshirt/Sweet Shirt -Light Gray.webp';
-
-const allSweatShirts = [
-  { img: Jackjony, name: 'Jack & Jones Sweatshirt', price: 'BDT 750TK', color: 'white' },
-  { img: Black, name: 'Sweatshirt (Black)', price: 'BDT 650TK', color: 'black' },
-  { img: Gray, name: 'Sweatshirt (Gray)', price: 'BDT 650TK', color: 'gray' },
-  { img: LightGray, name: 'Sweatshirt (Light Gray)', price: 'BDT 650TK', color: 'gray' },
-];
-
-const filters = [
-  { value: 'all', label: 'All', count: 4 },
-  { value: 'black', label: 'Black', count: 1 },
-  { value: 'gray', label: 'Gray', count: 2 },
-  { value: 'white', label: 'White / Others', count: 1 },
-];
+import { fetchProducts } from '../lib/api';
 
 const SweatShirt = () => {
   const [activeFilter, setActiveFilter] = useState('all');
-  const filtered = activeFilter === 'all' ? allSweatShirts : allSweatShirts.filter(s => s.color === activeFilter);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      const data = await fetchProducts('SweatShirt');
+      setProducts(data);
+      setLoading(false);
+    };
+    loadProducts();
+  }, []);
+
+  const filtered = activeFilter === 'all'
+    ? products
+    : products.filter(c => c.color === activeFilter);
+
+  // Dynamically generate filters based on products
+  const filters = [
+    { value: 'all', label: 'All', count: products.length },
+    { value: 'black', label: 'Black', count: products.filter(c => c.color === 'black').length },
+    { value: 'gray', label: 'Gray', count: products.filter(c => c.color === 'gray').length },
+    { value: 'white', label: 'White / Others', count: products.filter(c => c.color === 'white').length },
+  ];
 
   return (
-    <ProductPageLayout title="Premium Sweatshirts" filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter}>
-      <ProductGrid products={filtered} />
+    <ProductPageLayout
+      title="Premium Sweatshirts"
+      filters={filters}
+      activeFilter={activeFilter}
+      onFilterChange={setActiveFilter}
+    >
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <span className="w-10 h-10 border-4 border-olive/30 border-t-olive rounded-full animate-spin"></span>
+        </div>
+      ) : (
+        <ProductGrid products={filtered} />
+      )}
     </ProductPageLayout>
   );
 };
