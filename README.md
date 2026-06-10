@@ -1,87 +1,121 @@
-# 👗 Warmhut Fashion
+# WarmHut - Premium E-Commerce Platform
 
-> A stylish and modern e-commerce fashion website built with React, Tailwind CSS, and JavaScript.
+![WarmHut](https://img.shields.io/badge/Status-Active-brightgreen.svg)
+![React](https://img.shields.io/badge/Frontend-React.js-blue.svg)
+![Node.js](https://img.shields.io/badge/Backend-Node.js-green.svg)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB-success.svg)
 
----
+WarmHut is a modern, responsive, and full-stack e-commerce platform designed to sell premium winter clothing in Bangladesh. It features a sleek, professional UI with robust backend management, catering to both customers and administrators.
 
-## 🔗 Live Demo
+## 🚀 Features
 
-[![Live Site](https://img.shields.io/badge/Live%20Site-Visit%20Now-brightgreen?style=for-the-badge&logo=netlify)](https://warmhut-fashion.netlify.app)
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/sanoyon211/warmhut)
+### Customer Experience
+* **Modern & Responsive UI:** Fully responsive design that works seamlessly on desktop, tablet, and mobile. Built with Tailwind CSS using a mobile-first approach.
+* **Dynamic Homepage:** Sections automatically update based on the latest inventory added via the admin dashboard.
+* **Authentication:** Secure login and registration powered by Better Auth, including Google OAuth integration.
+* **Shopping Cart & Wishlist:** Persistent cart and wishlist management.
+* **Seamless Checkout:** Simple checkout process with Cash on Delivery (COD) and mobile banking options.
+* **User Dashboard:** Customers can view their order history, order statuses, and download invoice PDFs.
+* **Newsletter Subscription:** Integrated newsletter sign-up to receive updates and exclusive offers.
 
----
-
-## 📸 Preview
-
-<img width="1363" height="665" alt="Screenshot 2026-04-09 091258" src="https://github.com/user-attachments/assets/11e5f711-b3b9-4eb5-b395-f03cd136c9a2" />
-
----
-
-## 📖 Project Overview
-
-**Warmhut Fashion** is a modern fashion e-commerce web application that lets users browse clothing collections, view product details, and enjoy a seamless shopping experience. Built with React for dynamic UI and styled with Tailwind CSS for a clean, responsive design.
-
----
+### Admin Capabilities
+* **Role-Based Access Control:** Secure admin routes protected by authentication middlewares.
+* **Dashboard:** A comprehensive, mobile-responsive admin dashboard to oversee store operations.
+* **Product Management:** Full CRUD operations (Create, Read, Update, Delete) for inventory, complete with image uploads and description editing.
+* **Order Management:** View, track, and update the status of customer orders in real-time.
+* **Promo Code Management:** Generate and manage discount codes with expiry dates and usage limits.
+* **Customer Messages:** Read and manage queries submitted through the Contact Us page.
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| React.js | UI Components & State Management |
-| JavaScript (ES6+) | Logic & Interactivity |
-| Tailwind CSS | Utility-First Styling |
-| CSS3 | Custom Styles |
+**Frontend:**
+* React (Vite)
+* Tailwind CSS (Utility-first styling, responsive design)
+* React Router DOM (Routing)
+* AOS (Animate on Scroll)
+* jsPDF (Invoice generation)
 
----
+**Backend:**
+* Node.js & Express.js
+* MongoDB & Mongoose (Database)
+* Better Auth (Authentication & Session Management)
+* Nodemailer (Email notifications)
+* Multer (File & Image uploads)
 
-## ✨ Key Features
+## 📦 Installation & Setup
 
-- 🛍️ Product listing with categories and filters
-- 📱 Fully **responsive** design — mobile, tablet, desktop
-- 🔄 Dynamic rendering using React components
-- 🎨 Clean, elegant fashion-forward UI
-- ⚡ Fast performance with optimized Tailwind styles
+Follow these steps to run the project locally.
 
----
-
-## 📦 Dependencies
-
-```json
-{
-  "react": "^18.x",
-  "react-dom": "^18.x",
-  "react-router-dom": "^6.x",
-  "tailwindcss": "^3.x"
-}
+### 1. Clone the repository
+```bash
+git clone https://github.com/sanoyon211/warmhut.git
+cd warmhut
 ```
 
----
-
-## 🚀 Run Locally
+### 2. Install Dependencies
+You need to install dependencies for both the frontend and the backend.
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/sanoyon211/warmhut.git
-
-# 2. Navigate into the project folder
-cd warmhut
-
-# 3. Install dependencies
+# Install frontend dependencies
 npm install
 
-# 4. Start the development server
-npm run dev
-# OR
-npm start
-
-# 5. Open in browser
-# Visit: http://localhost:5173 or http://localhost:3000
+# Install backend dependencies
+cd server
+npm install
+cd ..
 ```
 
----
+### 3. Environment Variables
+Create a `.env` file in the `server` directory and add the following variables:
 
-## 🔗 Relevant Links
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/warmhut
+FRONTEND_URL=http://localhost:5173
 
-- 🌐 **Live Site:** [warmhut-fashion.netlify.app](https://warmhut-fashion.netlify.app)
-- 💻 **GitHub Repo:** [github.com/sanoyon211/warmhut](https://github.com/sanoyon211/warmhut)
-- 👤 **Developer:** [Md Sohab Akter Noyon](https://github.com/sanoyon211)
+# Better Auth
+BETTER_AUTH_SECRET=your_super_secret_key_here
+BETTER_AUTH_URL=http://localhost:5000
+
+# Google OAuth (Optional)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Nodemailer
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+```
+
+### 4. Run the Application
+You can run both the frontend and backend concurrently using the root package.json scripts.
+
+```bash
+# Run both frontend and backend
+npm run dev:all
+```
+* **Frontend:** Runs on `http://localhost:5173`
+* **Backend:** Runs on `http://localhost:5000`
+
+## 📂 Project Structure
+
+```
+warmhut/
+├── server/                 # Backend Node/Express code
+│   ├── models/             # MongoDB Mongoose schemas
+│   ├── routes/             # API route handlers
+│   ├── auth.js             # Better Auth configuration
+│   └── index.js            # Main Express server setup
+├── src/                    # Frontend React code
+│   ├── components/         # Reusable UI components
+│   ├── context/            # React Contexts (Cart, Wishlist, Toast)
+│   ├── homepage-component/ # Dynamic sections for the homepage
+│   ├── lib/                # API utility functions
+│   ├── pages/              # Main page components (Home, Shop, Admin)
+│   ├── NavFoot/            # Navigation and Footer
+│   └── main.jsx            # React entry point
+├── public/                 # Static assets
+└── package.json            # Project dependencies and scripts
+```
+
+## 📄 License
+This project is proprietary and intended for the WarmHut brand. All rights reserved.
