@@ -23,6 +23,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @route   GET /api/products/search
+// @desc    Search products by name or category
+// @access  Public
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) return res.json([]);
+    
+    // Case-insensitive regex search
+    const regex = new RegExp(q, 'i');
+    const products = await Product.find({
+      $or: [
+        { name: regex },
+        { category: regex }
+      ]
+    });
+    
+    res.json(products);
+  } catch (error) {
+    console.error('Error searching products:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 // @route   GET /api/products/:id
 // @desc    Get product by ID
 // @access  Public

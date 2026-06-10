@@ -15,6 +15,7 @@ const client = new MongoClient(mongoUri);
 export const db = client.db();
 
 export const auth = betterAuth({
+    baseURL: process.env.BACKEND_URL ? `${process.env.BACKEND_URL}/api/auth` : "http://localhost:5000/api/auth",
     database: mongodbAdapter(db, {
         usePlural: true
     }),

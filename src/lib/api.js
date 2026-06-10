@@ -19,6 +19,17 @@ export const fetchProducts = async (category = '', color = '') => {
   }
 };
 
+export const searchProducts = async (query) => {
+  try {
+    const response = await fetch(`${API_BASE}/products/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error('Failed to search products');
+    return await response.json();
+  } catch (error) {
+    console.error('Error searching products:', error);
+    return [];
+  }
+};
+
 export const createOrder = async (orderData) => {
   try {
     const response = await fetch(`${API_BASE}/orders`, {
@@ -59,5 +70,31 @@ export const getAllOrders = async () => {
   } catch (error) {
     console.error('Error fetching all orders:', error);
     return [];
+  }
+};
+
+export const getWishlist = async (userId) => {
+  try {
+    const response = await fetch(`${API_BASE}/wishlist/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch wishlist');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching wishlist:', error);
+    return { products: [] };
+  }
+};
+
+export const toggleWishlistApi = async (userId, productId) => {
+  try {
+    const response = await fetch(`${API_BASE}/wishlist/toggle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, productId })
+    });
+    if (!response.ok) throw new Error('Failed to toggle wishlist');
+    return await response.json();
+  } catch (error) {
+    console.error('Error toggling wishlist:', error);
+    throw error;
   }
 };

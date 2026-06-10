@@ -20,6 +20,7 @@ import Sucessfull from '../SignInUp/Sucessfull';
 import ProtectedRoute from '../components/ProtectedRoute';
 import UserDashboard from '../pages/Dashboard/UserDashboard';
 import AdminDashboard from '../pages/Dashboard/AdminDashboard';
+import SearchResults from '../pages/SearchResults';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       { path: 'wallet', element: <Wallet /> },
       { path: 'shoes', element: <Shoes /> },
       { path: 'offers', element: <OfferPage /> },
+      { path: 'search', element: <SearchResults /> },
       { path: 'product', element: <ProductDetail /> },
       { path: 'checkout', element: <Checkout /> },
       { path: 'wishlist', element: <WishlistPage /> },

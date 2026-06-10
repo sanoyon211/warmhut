@@ -3,7 +3,7 @@ import { FaSearch, FaPhone } from 'react-icons/fa';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { MdAccountCircle, MdClose } from 'react-icons/md';
 import { FiShoppingCart, FiHeart, FiX } from 'react-icons/fi';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import Logo from '../assets/logo.png';
@@ -27,6 +27,15 @@ const Navbar = () => {
   const { totalWishlist } = useWishlist();
   const menuRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setOpenSearch(false);
+      setSearchQuery('');
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -106,7 +115,8 @@ const Navbar = () => {
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
+                onKeyDown={handleSearch}
+                placeholder="Search products... (Press Enter)"
                 className="flex-1 px-2.5 py-2.5 bg-transparent text-gray-700 text-sm focus:outline-none"
               />
               {searchQuery && (
@@ -256,7 +266,8 @@ const Navbar = () => {
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
+              onKeyDown={handleSearch}
+              placeholder="Search products... (Press Enter)"
               className="flex-1 bg-transparent text-gray-700 text-sm focus:outline-none"
             />
           </div>
