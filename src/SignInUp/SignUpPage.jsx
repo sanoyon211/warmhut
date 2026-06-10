@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { signUp, signIn } from '../lib/auth-client';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect');
   const [showPass, setShowPass] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -25,7 +27,7 @@ const SignUpPage = () => {
     setLoading(true);
     setError('');
 
-    const { error } = await signUp.email({
+    const { data, error } = await signUp.email({
       name: form.name,
       email: form.email,
       password: form.password,
@@ -38,15 +40,28 @@ const SignUpPage = () => {
     if (error) {
       setError(error.message || 'Failed to create account');
     } else {
-      navigate('/successfull');
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else if (data?.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/successfull');
+      }
     }
   };
 
   const handleGoogleLogin = async () => {
-    await signIn.social({
-      provider: 'google',
-      callbackURL: window.location.origin + '/',
-    });
+    try {
+      const { data, error } = await signIn.social({
+        provider: 'google',
+        callbackURL: window.location.origin + (redirectUrl || '/dashboard'),
+      });
+      if (error) {
+        setError(error.message || 'Google sign up failed');
+      }
+    } catch (err) {
+      setError(err.message || 'An unexpected error occurred');
+    }
   };
 
   return (
@@ -124,9 +139,11 @@ const SignUpPage = () => {
             Sign Up with Google
           </button>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-gray-500 mt-10">
             Already have an account?{' '}
-            <Link to="/login" className="text-olive font-bold hover:underline">Sign In</Link>
+            <Link to={`/login${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-olive font-bold hover:underline">
+              Log In
+            </Link>
           </p>
         </div>
       </div>

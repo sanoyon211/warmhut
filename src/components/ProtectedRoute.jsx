@@ -21,6 +21,10 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  if (!adminOnly && session.user.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
   return children;
 };
 

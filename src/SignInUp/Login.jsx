@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { signIn } from '../lib/auth-client';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect');
   const [showPass, setShowPass] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -16,7 +18,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     
-    const { error } = await signIn.email({
+    const { data, error } = await signIn.email({
       email: form.email,
       password: form.password,
     });
@@ -26,15 +28,28 @@ const Login = () => {
     if (error) {
       setError(error.message || 'Failed to login');
     } else {
-      navigate('/');
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else if (data?.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
   const handleGoogleLogin = async () => {
-    await signIn.social({
-      provider: 'google',
-      callbackURL: window.location.origin + '/',
-    });
+    try {
+      const { data, error } = await signIn.social({
+        provider: 'google',
+        callbackURL: window.location.origin + (redirectUrl || '/dashboard'),
+      });
+      if (error) {
+        setError(error.message || 'Google sign in failed');
+      }
+    } catch (err) {
+      setError(err.message || 'An unexpected error occurred');
+    }
   };
 
   return (
@@ -118,10 +133,12 @@ const Login = () => {
             <FcGoogle className="w-5 h-5" />
             Continue with Google
           </button>
-
-          <p className="text-center text-sm text-gray-500">
+          {/* Footer */}
+          <p className="text-center text-sm text-gray-500 mt-10">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-olive font-bold hover:underline">Sign Up</Link>
+            <Link to={`/signup${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-olive font-bold hover:underline">
+              Sign Up
+            </Link>
           </p>
         </div>
       </div>

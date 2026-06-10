@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
 import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage } from '../../lib/api';
-import { useNavigate } from 'react-router';
-import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
+import { useNavigate, Link } from 'react-router';
+import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
 
 const AdminDashboard = () => {
@@ -167,91 +167,158 @@ const AdminDashboard = () => {
   const pendingOrders = orders.filter(o => o.status === 'Pending').length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-[1200px] mx-auto px-4">
-        
-        {/* Header */}
-        <div className="bg-gray-900 rounded-3xl p-8 mb-8 text-white flex flex-col md:flex-row justify-between items-center shadow-xl">
-          <div className="flex items-center gap-x-4 mb-4 md:mb-0">
-            <div className="w-14 h-14 bg-red-500 rounded-full flex items-center justify-center shadow-lg shadow-red-500/20">
-              <FiShield className="w-6 h-6 text-white" />
+    <div className="flex min-h-screen bg-gray-50">
+      
+      {/* ── Left Sidebar ── */}
+      <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col fixed left-0 top-0 shadow-2xl z-10">
+        {/* Brand Header */}
+        <div className="p-6 border-b border-gray-800">
+          <div className="flex items-center gap-x-3">
+            <div className="w-10 h-10 bg-olive rounded-xl flex items-center justify-center shadow-lg shadow-olive/20">
+              <FiShield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-black text-2xl">Admin Portal</h1>
-              <p className="text-gray-400 text-sm">Welcome back, {session?.user?.name}</p>
-            </div>
-          </div>
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-x-2 bg-white/10 hover:bg-white/20 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors"
-          >
-            <FiLogOut /> Logout
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-x-5">
-            <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
-              <FiBox className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Orders</p>
-              <p className="text-3xl font-black text-gray-900">{orders.length}</p>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-x-5">
-            <div className="w-14 h-14 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center">
-              <FiUsers className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Pending Orders</p>
-              <p className="text-3xl font-black text-gray-900">{pendingOrders}</p>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-x-5">
-            <div className="w-14 h-14 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center">
-              <FiDollarSign className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Revenue</p>
-              <p className="text-3xl font-black text-gray-900">৳{totalRevenue}</p>
+              <h1 className="font-black text-lg tracking-tight">Admin Portal</h1>
+              <p className="text-gray-400 text-xs font-medium">WarmHut Store</p>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-x-2 mb-6">
+        {/* Navigation Menu */}
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest px-4 pb-2 pt-2">Menu</p>
+          
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors ${activeTab === 'orders' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+            className={`w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+              activeTab === 'orders' ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+            }`}
           >
-            Orders
+            <FiBox className={`w-5 h-5 ${activeTab === 'orders' ? 'text-white' : 'text-gray-500'}`} />
+            Orders Management
           </button>
+
           <button
             onClick={() => setActiveTab('products')}
-            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors ${activeTab === 'products' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+            className={`w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+              activeTab === 'products' ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+            }`}
           >
-            Products
+            <FiBox className={`w-5 h-5 ${activeTab === 'products' ? 'text-white' : 'text-gray-500'}`} />
+            Products & Inventory
           </button>
+
           <button
             onClick={() => setActiveTab('promos')}
-            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors ${activeTab === 'promos' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+            className={`w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+              activeTab === 'promos' ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+            }`}
           >
+            <FiTag className={`w-5 h-5 ${activeTab === 'promos' ? 'text-white' : 'text-gray-500'}`} />
             Promo Codes
           </button>
+
           <button
             onClick={() => setActiveTab('messages')}
-            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors flex items-center gap-x-2 ${activeTab === 'messages' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+            className={`w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 flex justify-between ${
+              activeTab === 'messages' ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+            }`}
           >
-            Messages
+            <div className="flex items-center gap-x-3">
+              <FiMessageSquare className={`w-5 h-5 ${activeTab === 'messages' ? 'text-white' : 'text-gray-500'}`} />
+              Messages
+            </div>
             {messages.filter(m => m.status === 'unread').length > 0 && (
-              <span className="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px]">
+              <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
                 {messages.filter(m => m.status === 'unread').length}
               </span>
             )}
           </button>
+        </nav>
+
+        {/* Footer Actions */}
+        <div className="p-4 border-t border-gray-800 space-y-2">
+          <Link to="/">
+            <button className="w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+              <FiHome className="w-5 h-5 text-gray-500" />
+              Back to Store
+            </button>
+          </Link>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+          >
+            <FiLogOut className="w-5 h-5" />
+            Logout
+          </button>
         </div>
+      </aside>
+
+      {/* ── Main Content Area ── */}
+      <main className="flex-1 ml-64 p-8">
+        
+        {/* Top Header */}
+        <header className="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+          <div>
+            <h2 className="text-2xl font-black text-gray-900 capitalize">{activeTab}</h2>
+            <p className="text-sm text-gray-500 mt-1">Manage your store {activeTab} and operations.</p>
+          </div>
+          <div className="flex items-center gap-x-4 border-l border-gray-100 pl-6">
+            <div className="text-right hidden md:block">
+              <p className="text-sm font-bold text-gray-900">{session?.user?.name}</p>
+              <p className="text-[10px] uppercase tracking-wider font-bold text-olive">{session?.user?.role}</p>
+            </div>
+            {session?.user?.image ? (
+              <img 
+                src={session.user.image} 
+                alt="Admin" 
+                className="w-12 h-12 rounded-2xl object-cover shadow-sm" 
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(session?.user?.name || 'A')}&background=random`;
+                }}
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gray-100 text-gray-700 rounded-2xl flex items-center justify-center font-black text-xl shadow-sm">
+                {session?.user?.name?.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* Stats (Show globally or only on orders) */}
+        {activeTab === 'orders' && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-x-5 hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center">
+                <FiBox className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Orders</p>
+                <p className="text-3xl font-black text-gray-900">{orders.length}</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-x-5 hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center">
+                <FiUsers className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Pending Orders</p>
+                <p className="text-3xl font-black text-gray-900">{pendingOrders}</p>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-x-5 hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center">
+                <FiDollarSign className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Total Revenue</p>
+                <p className="text-3xl font-black text-gray-900">৳{totalRevenue}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
@@ -488,8 +555,7 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
-
-      </div>
+      </main>
 
       {/* Product Modal */}
       {showProductModal && (

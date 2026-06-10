@@ -6,6 +6,7 @@ import { FiShoppingCart, FiHeart, FiX } from 'react-icons/fi';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useSession } from '../lib/auth-client';
 import Logo from '../assets/logo.png';
 
 const navLinks = [
@@ -25,6 +26,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { totalItems, setIsCartOpen, isCartOpen } = useCart(); // isCartOpen add kora hoyeche highlight er jonno
   const { totalWishlist } = useWishlist();
+  const { data: session } = useSession();
   const menuRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -154,15 +156,28 @@ const Navbar = () => {
             <div className="w-px h-5 bg-gray-200 mx-2" />
 
             {/* Account - Highlighted if active */}
-            <Link to="/login">
+            <Link to={session?.user ? "/dashboard" : "/login"}>
               <button
                 className={`p-2 rounded-xl transition-all duration-200 ${
-                  isActive('/login') || isActive('/signup')
+                  isActive('/login') || isActive('/signup') || isActive('/dashboard')
                     ? 'bg-olive/10 text-olive shadow-sm'
                     : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                <MdAccountCircle className="w-6 h-6" />
+                {session?.user && session.user.image ? (
+                  <img 
+                    src={session.user.image} 
+                    alt={session.user.name} 
+                    className="w-6 h-6 rounded-full object-cover" 
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.name || 'User')}&background=random`;
+                    }}
+                  />
+                ) : (
+                  <MdAccountCircle className="w-6 h-6" />
+                )}
               </button>
             </Link>
 
@@ -342,23 +357,49 @@ const Navbar = () => {
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] px-3 pb-2">
                   Account
                 </p>
-                <Link to="/login" onClick={() => setOpenMenu(false)}>
-                  <div
-                    className={`px-3 py-3 rounded-xl text-sm font-bold flex items-center gap-x-3 transition-all ${isActive('/login') ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-700 hover:bg-gray-50'}`}
-                  >
-                    <MdAccountCircle
-                      className={`w-5 h-5 ${isActive('/login') ? 'text-white' : 'text-gray-400'}`}
-                    />{' '}
-                    Log In
-                  </div>
-                </Link>
-                <Link to="/signup" onClick={() => setOpenMenu(false)}>
-                  <div
-                    className={`px-3 py-3 rounded-xl text-sm font-black flex items-center gap-x-3 transition-all ${isActive('/signup') ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-olive bg-olive/5'}`}
-                  >
-                    <span>✦</span> Sign Up
-                  </div>
-                </Link>
+                {session?.user ? (
+                  <Link to="/dashboard" onClick={() => setOpenMenu(false)}>
+                    <div
+                      className={`px-3 py-3 rounded-xl text-sm font-bold flex items-center gap-x-3 transition-all ${isActive('/dashboard') ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      {session.user.image ? (
+                        <img 
+                          src={session.user.image} 
+                          alt={session.user.name} 
+                          className="w-5 h-5 rounded-full object-cover" 
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.name || 'User')}&background=random`;
+                          }}
+                        />
+                      ) : (
+                        <MdAccountCircle className={`w-5 h-5 ${isActive('/dashboard') ? 'text-white' : 'text-gray-400'}`} />
+                      )}
+                      Dashboard
+                    </div>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/login" onClick={() => setOpenMenu(false)}>
+                      <div
+                        className={`px-3 py-3 rounded-xl text-sm font-bold flex items-center gap-x-3 transition-all ${isActive('/login') ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        <MdAccountCircle
+                          className={`w-5 h-5 ${isActive('/login') ? 'text-white' : 'text-gray-400'}`}
+                        />{' '}
+                        Log In
+                      </div>
+                    </Link>
+                    <Link to="/signup" onClick={() => setOpenMenu(false)}>
+                      <div
+                        className={`px-3 py-3 rounded-xl text-sm font-black flex items-center gap-x-3 transition-all ${isActive('/signup') ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-olive bg-olive/5'}`}
+                      >
+                        <span>✦</span> Sign Up
+                      </div>
+                    </Link>
+                  </>
+                )}
                 <Link to="/wishlist" onClick={() => setOpenMenu(false)}>
                   <div
                     className={`px-3 py-3 rounded-xl text-sm font-bold flex items-center gap-x-3 transition-all ${isActive('/wishlist') ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'text-gray-700 hover:bg-gray-50'}`}

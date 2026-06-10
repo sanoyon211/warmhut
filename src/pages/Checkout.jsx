@@ -58,6 +58,19 @@ const Checkout = () => {
 
   const update = field => e => setForm({ ...form, [field]: e.target.value });
 
+  // Pre-fill user data when session loads
+  React.useEffect(() => {
+    if (session?.user) {
+      setForm(prev => ({
+        ...prev,
+        name: prev.name || session.user.name || '',
+        email: prev.email || session.user.email || '',
+        phone: prev.phone || session.user.phone || '',
+        address: prev.address || session.user.address || ''
+      }));
+    }
+  }, [session]);
+
   const handleApplyPromo = async () => {
     if (!promoCode.trim()) return;
     setPromoApplying(true);
@@ -194,6 +207,20 @@ const Checkout = () => {
 
           {/* ── Left: Form ── */}
           <div className="lg:col-span-3 space-y-5">
+
+            {!session?.user && (
+              <div className="bg-olive/5 border border-olive/20 p-4 rounded-2xl flex items-center justify-between shadow-sm">
+                <div>
+                  <h3 className="font-bold text-gray-900 text-sm">Already have an account?</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">Log in for faster checkout & tracking.</p>
+                </div>
+                <Link to="/login?redirect=/checkout">
+                  <button className="bg-olive hover:bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors">
+                    Log In
+                  </button>
+                </Link>
+              </div>
+            )}
 
             {/* Delivery Info */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
