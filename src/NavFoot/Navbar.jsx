@@ -66,7 +66,7 @@ const Navbar = () => {
     <>
       {/* ── Sticky Navbar wrapper ── */}
       <header
-        className={`sticky top-0 z-50 bg-white transition-all duration-300 ${scrolled ? 'shadow-md' : 'border-b border-gray-100'}`}
+        className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'shadow-lg bg-white/85 backdrop-blur-xl border-b border-gray-100/50' : 'bg-white border-b border-gray-100'}`}
       >
         {/* Top bar — hidden on mobile */}
         {/* max-height bebohar kora hoyeche jate flickering na hoy */}
@@ -138,16 +138,18 @@ const Navbar = () => {
             {navLinks.map(link => (
               <Link key={link.to} to={link.to}>
                 <span
-                  className={`px-3 py-1.5 rounded-lg text-[13px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer
+                  className={`relative px-3 py-1.5 rounded-lg text-[12px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer overflow-hidden group
                   ${
                     link.special
-                      ? 'text-amber-600 hover:bg-amber-50'
+                      ? 'text-amber-600 hover:text-amber-700'
                       : isActive(link.to)
-                        ? 'bg-olive/10 text-olive'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                        ? 'text-olive'
+                        : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {link.label}
+                  <span className="relative z-10">{link.label}</span>
+                  {/* Hover underline effect */}
+                  <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-olive transform origin-left transition-transform duration-300 ${isActive(link.to) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
                 </span>
               </Link>
             ))}

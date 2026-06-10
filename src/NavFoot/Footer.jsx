@@ -67,9 +67,9 @@ const Footer = () => {
                 {[
                   { label: 'FAQ', to: '/faq' },
                   { label: 'Return & Refund Policy', to: '/return-policy' },
-                  { label: 'Delivery Policy', to: '/faq' },
+                  { label: 'Delivery Policy', to: '/delivery-policy' },
                   { label: 'Contact Us', to: '/contact' },
-                  { label: 'Terms & Conditions', to: '#' },
+                  { label: 'Terms & Conditions', to: '/terms' },
                 ].map(item => (
                   <Link key={item.label} to={item.to} className="block">
                     <p className="text-gray-400 text-sm hover:text-olive transition-colors cursor-pointer">{item.label}</p>

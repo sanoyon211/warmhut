@@ -219,11 +219,20 @@ const ProductDetail = () => {
               </div>
 
               {/* Price */}
-              <div className="flex items-center gap-x-4">
+              <div className="flex items-center gap-x-4 mb-6">
                 <span className="text-3xl font-black text-olive">BDT {product.price}TK</span>
                 <span className="text-lg text-gray-300 line-through">BDT {Math.round(product.price * 1.2)}TK</span>
                 <span className="bg-red-50 text-red-500 text-xs font-black px-2.5 py-1 rounded-xl">-20%</span>
               </div>
+
+              {/* Description */}
+              {product.description && (
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
+                    {product.description}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="h-px bg-gray-100" />

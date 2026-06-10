@@ -117,7 +117,7 @@ router.get('/related/:id', async (req, res) => {
 // @access  Private/Admin
 router.post('/', requireAdmin, async (req, res) => {
   try {
-    const { name, price, category, color, image, stock } = req.body;
+    const { name, price, category, color, image, stock, description } = req.body;
 
     const newProduct = new Product({
       name,
@@ -125,7 +125,8 @@ router.post('/', requireAdmin, async (req, res) => {
       category,
       color,
       image,
-      stock
+      stock,
+      description
     });
 
     const savedProduct = await newProduct.save();

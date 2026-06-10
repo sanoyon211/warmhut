@@ -19,6 +19,8 @@ import SearchResults from '../pages/SearchResults';
 import FAQ from '../pages/FAQ';
 import ReturnPolicy from '../pages/ReturnPolicy';
 import ContactUs from '../pages/ContactUs';
+import DeliveryPolicy from '../pages/DeliveryPolicy';
+import TermsAndConditions from '../pages/TermsAndConditions';
 
 const router = createBrowserRouter([
   {
@@ -37,6 +39,8 @@ const router = createBrowserRouter([
       { path: 'search', element: <SearchResults /> },
       { path: 'faq', element: <FAQ /> },
       { path: 'return-policy', element: <ReturnPolicy /> },
+      { path: 'delivery-policy', element: <DeliveryPolicy /> },
+      { path: 'terms', element: <TermsAndConditions /> },
       { path: 'contact', element: <ContactUs /> },
       { path: 'product', element: <ProductDetail /> },
       { path: 'checkout', element: <Checkout /> },

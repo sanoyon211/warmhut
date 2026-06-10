@@ -40,11 +40,11 @@ const Card = ({ bgImg, title, subTitle, id, category }) => {
   const rating = (((itemId.charCodeAt(0) % 10) / 10) + 4).toFixed(1);
 
   return (
-    <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-olive/30 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer">
+    <div className="group relative bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-olive/20 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col cursor-pointer">
       {/* Image */}
-      <div className="relative overflow-hidden bg-gray-50 aspect-[3/4]" onClick={goToDetail}>
-        <img src={bgImg} alt={subTitle} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+      <div className="relative overflow-hidden bg-gray-100 aspect-[3/4]" onClick={goToDetail}>
+        <img src={bgImg} alt={subTitle} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-500" />
 
         {/* Wishlist */}
         <button onClick={handleWishlist} className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md hover:scale-110 transition-transform z-10">
@@ -52,31 +52,31 @@ const Card = ({ bgImg, title, subTitle, id, category }) => {
         </button>
 
         {/* View Details hint */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <span className="bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold px-4 py-2 rounded-full shadow-lg">👁 View Details</span>
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10">
+          <span className="bg-white/90 backdrop-blur-md text-gray-900 text-xs font-black px-6 py-2.5 rounded-full shadow-xl translate-y-4 group-hover:translate-y-0 transition-all duration-500">View Details</span>
         </div>
 
         {/* Add to Cart slide up */}
-        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <button onClick={handleAddToCart} className="w-full py-3 bg-olive text-white text-xs font-bold flex items-center justify-center gap-x-2 hover:bg-gray-900 transition-colors">
-            <FiShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+        <div className="absolute bottom-2 left-2 right-2 translate-y-[120%] group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
+          <button onClick={handleAddToCart} className="w-full py-3.5 bg-white/90 backdrop-blur-xl text-gray-900 text-xs font-black rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] flex items-center justify-center gap-x-2 hover:bg-olive hover:text-white transition-colors duration-300 border border-white/50">
+            <FiShoppingCart className="w-4 h-4" /> Quick Add
           </button>
         </div>
       </div>
 
       {/* Info */}
-      <div className="p-3 md:p-4 flex flex-col gap-y-1 flex-1" onClick={goToDetail}>
-        <p className="text-xs text-gray-400 font-medium truncate">{subTitle}</p>
-        <div className="flex items-center justify-between">
-          <span className="text-olive font-black text-sm md:text-base">{title}</span>
-          <div className="flex items-center gap-x-0.5">
-            <BsStarFill className="w-2.5 h-2.5 text-yellow-400" />
-            <span className="text-[10px] text-gray-400 font-medium">{rating}</span>
+      <div className="p-4 md:p-5 flex flex-col gap-y-1.5 flex-1" onClick={goToDetail}>
+        <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider truncate">{subTitle}</p>
+        <div className="flex items-center justify-between mt-1">
+          <span className="text-gray-900 font-black text-sm md:text-lg tracking-tight">{title}</span>
+          <div className="flex items-center gap-x-1 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+            <BsStarFill className="w-2.5 h-2.5 text-amber-400" />
+            <span className="text-[10px] text-gray-600 font-bold">{rating}</span>
           </div>
         </div>
         {/* Mobile button */}
-        <button onClick={handleAddToCart} className="mt-2 w-full py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold flex items-center justify-center gap-x-1 hover:bg-olive hover:text-white hover:border-olive transition-all md:hidden">
-          <FiShoppingCart className="w-3 h-3" /> Add to Cart
+        <button onClick={handleAddToCart} className="mt-3 w-full py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-xs font-bold flex items-center justify-center gap-x-2 hover:bg-olive hover:text-white hover:border-olive transition-all md:hidden">
+          <FiShoppingCart className="w-3.5 h-3.5" /> Quick Add
         </button>
       </div>
     </div>

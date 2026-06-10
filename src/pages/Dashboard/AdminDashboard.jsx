@@ -19,7 +19,7 @@ const AdminDashboard = () => {
 
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [productForm, setProductForm] = useState({ name: '', price: '', category: '', color: '', image: '', stock: '' });
+  const [productForm, setProductForm] = useState({ name: '', price: '', category: '', color: '', image: '', stock: '', description: '' });
   const [imageFile, setImageFile] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isNewCategory, setIsNewCategory] = useState(false);
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
         showToast('Product created!', 'success');
       }
       setShowProductModal(false);
-      setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '' });
+      setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '', description: '' });
       setImageFile(null);
       setEditingProduct(null);
       setIsNewCategory(false);
@@ -141,7 +141,7 @@ const AdminDashboard = () => {
     setEditingProduct(product);
     setProductForm({
       name: product.name, price: product.price, category: product.category,
-      color: product.color, image: product.image, stock: product.stock
+      color: product.color, image: product.image, stock: product.stock, description: product.description || ''
     });
     setImageFile(null);
     setIsNewCategory(false);
@@ -572,6 +572,10 @@ const AdminDashboard = () => {
                 <div className="col-span-2">
                   <label className="block text-sm font-bold text-gray-700 mb-1">Product Name</label>
                   <input type="text" required value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Description (Optional)</label>
+                  <textarea rows="3" value={productForm.description} onChange={e => setProductForm({...productForm, description: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none resize-none" placeholder="Enter product description..." />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Price (৳)</label>
