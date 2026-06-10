@@ -8,6 +8,8 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { auth } from "./auth.js";
 import { toNodeHandler } from "better-auth/node";
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
@@ -70,14 +72,19 @@ app.use("/api/promo", promoRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Multer Storage Configuration (Cloudinary)
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'warmhut_uploads',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'gif']
   }
 });
 const upload = multer({ storage: storage });
@@ -89,9 +96,8 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
-  // Construct the full URL for the image
-  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:5000';
-  const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+  // Construct the full URL for the image (Cloudinary provides it in req.file.path)
+  const imageUrl = req.file.path;
   res.json({ imageUrl });
 });
 
@@ -100,6 +106,10 @@ app.get("/", (req, res) => {
     res.send("Warmhut Backend API is running!");
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+}
+
+export default app;
