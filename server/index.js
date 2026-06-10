@@ -7,6 +7,7 @@ import { toNodeHandler } from "better-auth/node";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
+import promoRoutes from "./routes/promoRoutes.js";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.all("/api/auth/*path", toNodeHandler(auth));
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/promo", promoRoutes);
 
 // Default route for testing
 app.get("/", (req, res) => {

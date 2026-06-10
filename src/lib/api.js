@@ -125,3 +125,18 @@ export const getProductById = async (id) => {
     return null;
   }
 };
+
+export const validatePromo = async (code) => {
+  try {
+    const response = await fetch(`${API_BASE}/promo/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to validate promo');
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

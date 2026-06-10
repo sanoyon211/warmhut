@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useLocation, Link } from 'react-router';
+import { useLocation, Link, useNavigate } from 'react-router';
 import { useSession } from '../lib/auth-client';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { createOrder } from '../lib/api';
-import { FiUser, FiPhone, FiMapPin, FiChevronDown, FiCheck } from 'react-icons/fi';
+import { createOrder, validatePromo } from '../lib/api';
+import { FiUser, FiPhone, FiMapPin, FiChevronDown, FiCheck, FiTag } from 'react-icons/fi';
 import { BsTruck, BsCashCoin } from 'react-icons/bs';
 
 
@@ -19,16 +19,20 @@ const Checkout = () => {
   const directQty = location.state?.qty || 1;
   const directSize = location.state?.selectedSize || 'M';
 
-  const orderItems = directProduct
-    ? [{ ...directProduct, qty: directQty, size: directSize }]
-    : cartItems.map(i => ({ ...i, size: 'M' }));
+  const checkoutItems = directProduct
+    ? [{ ...directProduct, quantity: directQty, size: directSize }]
+    : cartItems.map(i => ({ ...i, quantity: i.qty || 1, size: 'M' }));
 
-  const subtotal = directProduct
-    ? directProduct.price * directQty
-    : totalPrice;
+  const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const delivery = subtotal >= 1000 ? 0 : 60;
 
-  const deliveryFee = subtotal >= 1000 ? 0 : 60;
-  const grandTotal = subtotal + deliveryFee;
+  // Promo states
+  const [promoCode, setPromoCode] = useState('');
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [promoApplying, setPromoApplying] = useState(false);
+
+  const discountAmount = Math.round((subtotal * discountPercent) / 100);
+  const total = subtotal + delivery - discountAmount;
 
   const [form, setForm] = useState({
     name: '', phone: '', address: '', area: '', note: '',
@@ -39,6 +43,21 @@ const Checkout = () => {
   const [orderId, setOrderId] = useState('');
 
   const update = field => e => setForm({ ...form, [field]: e.target.value });
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoApplying(true);
+    try {
+      const data = await validatePromo(promoCode);
+      setDiscountPercent(data.discountPercent);
+      showToast(data.message, 'success');
+    } catch (error) {
+      setDiscountPercent(0);
+      showToast(error.message || 'Invalid promo code', 'error');
+    } finally {
+      setPromoApplying(false);
+    }
+  };
 
   const handleOrder = async (e) => {
     e.preventDefault();
@@ -58,12 +77,13 @@ const Checkout = () => {
           area: form.area,
           note: form.note
         },
-        items: orderItems,
+        items: checkoutItems,
         payment: payMethod,
         financials: {
           subtotal,
-          deliveryFee,
-          grandTotal
+          deliveryFee: delivery,
+          discount: discountAmount,
+          grandTotal: total
         }
       };
 
@@ -102,7 +122,7 @@ const Checkout = () => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Total Paid</span>
-              <span className="font-black text-olive">BDT {grandTotal}TK</span>
+              <span className="font-black text-olive">BDT {total}TK</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Payment</span>
@@ -275,13 +295,13 @@ const Checkout = () => {
 
               {/* Items */}
               <div className="space-y-3 mb-5 max-h-60 overflow-y-auto">
-                {orderItems.map((item, i) => (
+                {checkoutItems.map((item, i) => (
                   <div key={i} className="flex gap-x-3 items-center">
                     <img src={item.image} alt={item.name} className="w-14 h-16 rounded-xl object-cover flex-shrink-0 border border-gray-100" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-tight">{item.name}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">Size: {item.size} · Qty: {item.qty}</p>
-                      <p className="text-xs font-black text-olive mt-0.5">BDT {item.price * item.qty}TK</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Size: {item.size} · Qty: {item.quantity}</p>
+                      <p className="text-xs font-black text-olive mt-0.5">BDT {item.price * item.quantity}TK</p>
                     </div>
                   </div>
                 ))}
@@ -295,22 +315,44 @@ const Checkout = () => {
                   <span className="text-gray-500">Subtotal</span>
                   <span className="font-semibold text-gray-800">BDT {subtotal}TK</span>
                 </div>
+                {discountPercent > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount ({discountPercent}%)</span>
+                    <span>- BDT {discountAmount}TK</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Delivery</span>
-                  <span className={`font-semibold ${deliveryFee === 0 ? 'text-green-500' : 'text-gray-800'}`}>
-                    {deliveryFee === 0 ? 'FREE 🎉' : `BDT ${deliveryFee}TK`}
+                  <span className={`font-semibold ${delivery === 0 ? 'text-green-500' : 'text-gray-800'}`}>
+                    {delivery === 0 ? 'FREE 🎉' : `BDT ${delivery}TK`}
                   </span>
                 </div>
-                {deliveryFee > 0 && (
-                  <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-xl">
-                    Add BDT {1000 - subtotal}TK more for free delivery!
-                  </p>
-                )}
               </div>
 
               <div className="flex justify-between font-black text-base border-t border-gray-100 pt-4 mb-5">
                 <span className="text-gray-900">Total</span>
-                <span className="text-olive text-xl">BDT {grandTotal}TK</span>
+                <span className="text-olive text-xl">BDT {total}TK</span>
+              </div>
+
+              {/* Promo Code Section */}
+              <div className="mb-5">
+                <div className="flex gap-x-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={e => setPromoCode(e.target.value)}
+                    placeholder="Enter Promo Code"
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-olive transition-colors uppercase"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyPromo}
+                    disabled={promoApplying || !promoCode.trim()}
+                    className="px-4 py-3 bg-gray-900 text-white font-bold rounded-xl text-xs hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                  >
+                    {promoApplying ? '...' : 'Apply'}
+                  </button>
+                </div>
               </div>
 
               <button

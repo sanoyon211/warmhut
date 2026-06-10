@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
 import { getUserOrders } from '../../lib/api';
 import { useNavigate } from 'react-router';
-import { FiUser, FiLogOut, FiPackage, FiShoppingBag } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiPackage, FiShoppingBag, FiDownload } from 'react-icons/fi';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const UserDashboard = () => {
   const { data: session } = useSession();
@@ -24,6 +26,78 @@ const UserDashboard = () => {
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const handleDownloadInvoice = (order) => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('WarmHut', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Premium Winter Wear', 14, 26);
+    
+    // Invoice Info
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INVOICE', 150, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Order ID: #${order.orderId.substring(0, 8)}`, 150, 26);
+    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 150, 32);
+
+    // Customer Info
+    doc.setFont('helvetica', 'bold');
+    doc.text('Billed To:', 14, 45);
+    doc.setFont('helvetica', 'normal');
+    doc.text(order.customer.name, 14, 51);
+    doc.text(order.customer.phone, 14, 57);
+    doc.text(`${order.customer.address}, ${order.customer.area}`, 14, 63);
+
+    // Items Table
+    const tableColumn = ["Item", "Size", "Qty", "Unit Price", "Total"];
+    const tableRows = [];
+
+    order.items.forEach(item => {
+      const itemData = [
+        item.name,
+        item.size || '-',
+        item.qty,
+        `BDT ${item.price}TK`,
+        `BDT ${item.price * item.qty}TK`
+      ];
+      tableRows.push(itemData);
+    });
+
+    doc.autoTable({
+      startY: 75,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'grid',
+      headStyles: { fillColor: [75, 83, 32] } // Olive green
+    });
+
+    const finalY = doc.lastAutoTable.finalY || 75;
+
+    // Financials
+    doc.text(`Subtotal: BDT ${order.financials.subtotal}TK`, 140, finalY + 10);
+    doc.text(`Delivery Fee: BDT ${order.financials.deliveryFee}TK`, 140, finalY + 16);
+    if (order.financials.discount > 0) {
+      doc.text(`Discount: - BDT ${order.financials.discount}TK`, 140, finalY + 22);
+    }
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Grand Total: BDT ${order.financials.grandTotal}TK`, 140, finalY + (order.financials.discount > 0 ? 28 : 22));
+
+    // Footer
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Thank you for shopping with WarmHut!', 14, 280);
+
+    doc.save(`Invoice_WarmHut_${order.orderId.substring(0,8)}.pdf`);
   };
 
   if (!session?.user) return null;
@@ -109,9 +183,18 @@ const UserDashboard = () => {
                       ))}
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-4 flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total Amount:</span>
-                      <span className="font-black text-olive text-lg">BDT {order.financials.grandTotal}</span>
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                      <div className="bg-gray-50 rounded-xl px-4 py-2 flex items-center">
+                        <span className="text-sm text-gray-600 mr-2">Total:</span>
+                        <span className="font-black text-olive text-lg">BDT {order.financials.grandTotal}</span>
+                      </div>
+                      <button 
+                        onClick={() => handleDownloadInvoice(order)}
+                        className="flex items-center gap-x-2 px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-olive transition-colors"
+                      >
+                        <FiDownload className="w-3.5 h-3.5" />
+                        Download Invoice
+                      </button>
                     </div>
                   </div>
                 ))}
