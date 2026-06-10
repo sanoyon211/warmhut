@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { createOrder } from '../lib/api';
 import { FiUser, FiPhone, FiMapPin, FiChevronDown, FiCheck } from 'react-icons/fi';
 import { BsTruck, BsCashCoin } from 'react-icons/bs';
 
@@ -39,17 +40,40 @@ const Checkout = () => {
 
   const handleOrder = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.address) {
+    if (!form.name || !form.phone || !form.address || !form.area) {
       showToast('⚠️ Please fill all required fields!', 'error');
       return;
     }
     setPlacing(true);
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1800));
-    setPlacing(false);
-    setOrderId(`WH-${Date.now().toString().slice(-6)}`);
-    setStep(2);
-    if (!directProduct) clearCart();
+    
+    try {
+      const orderPayload = {
+        customer: {
+          name: form.name,
+          phone: form.phone,
+          address: form.address,
+          area: form.area,
+          note: form.note
+        },
+        items: orderItems,
+        payment: payMethod,
+        financials: {
+          subtotal,
+          deliveryFee,
+          grandTotal
+        }
+      };
+
+      const result = await createOrder(orderPayload);
+      
+      setOrderId(result.orderId);
+      setStep(2);
+      if (!directProduct) clearCart();
+    } catch (error) {
+      showToast('❌ Failed to place order. Please try again.', 'error');
+    } finally {
+      setPlacing(false);
+    }
   };
 
   // ── Success Screen ──

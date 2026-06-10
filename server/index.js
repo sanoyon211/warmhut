@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { auth } from "./auth.js";
 import { toNodeHandler } from "better-auth/node";
 import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 dotenv.config();
 
@@ -34,8 +35,9 @@ mongoose.connect(mongoUri)
 // Mount Better Auth handler
 app.all("/api/auth/*path", toNodeHandler(auth));
 
-// Mount Product Routes
+// Mount Routes
 app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
 // Default route for testing
 app.get("/", (req, res) => {

@@ -18,3 +18,24 @@ export const fetchProducts = async (category = '', color = '') => {
     return [];
   }
 };
+
+export const createOrder = async (orderData) => {
+  try {
+    const response = await fetch(`${API_BASE}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData)
+    });
+    
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to create order');
+    }
+    return data;
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error;
+  }
+};
