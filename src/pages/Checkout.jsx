@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router';
+import { useLocation, Link } from 'react-router';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { FiUser, FiPhone, FiMapPin, FiChevronDown, FiCheck } from 'react-icons/fi';
@@ -8,7 +8,6 @@ import { BsTruck, BsCashCoin } from 'react-icons/bs';
 
 const Checkout = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { cartItems, totalPrice, clearCart } = useCart();
   const { showToast } = useToast();
 
@@ -34,6 +33,7 @@ const Checkout = () => {
   const [payMethod, setPayMethod] = useState('cod');
   const [placing, setPlacing] = useState(false);
   const [step, setStep] = useState(1); // 1: form, 2: success
+  const [orderId, setOrderId] = useState('');
 
   const update = field => e => setForm({ ...form, [field]: e.target.value });
 
@@ -47,13 +47,13 @@ const Checkout = () => {
     // Simulate API call
     await new Promise(r => setTimeout(r, 1800));
     setPlacing(false);
+    setOrderId(`WH-${Date.now().toString().slice(-6)}`);
     setStep(2);
     if (!directProduct) clearCart();
   };
 
   // ── Success Screen ──
   if (step === 2) {
-    const orderId = `WH-${Date.now().toString().slice(-6)}`;
     return (
       <div className="min-h-[85vh] flex items-center justify-center px-4 bg-gray-50">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-gray-100 p-10 text-center">

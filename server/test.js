@@ -15,7 +15,7 @@ server.listen(5001, async () => {
         const res = await fetch("http://localhost:5001/api/auth/sign-up/email", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Origin": "http://localhost:5173" },
-            body: JSON.stringify({name: "Test", email: "test88@ex.com", password: "password123" })
+            body: JSON.stringify({name: "Test2", email: "test89@ex.com", password: "password123", phone: "01715825331", address: "tersus triduana uxor" })
         });
         console.log("Status:", res.status);
         console.log("Body:", await res.text());

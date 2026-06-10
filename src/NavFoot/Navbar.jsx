@@ -44,6 +44,7 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpenMenu(false);
     setOpenSearch(false);
   }, [location.pathname]);

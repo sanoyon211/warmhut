@@ -25,7 +25,7 @@ const SignUpPage = () => {
     setLoading(true);
     setError('');
 
-    const { data, error } = await signUp.email({
+    const { error } = await signUp.email({
       name: form.name,
       email: form.email,
       password: form.password,

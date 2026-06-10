@@ -16,7 +16,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     
-    const { data, error } = await signIn.email({
+    const { error } = await signIn.email({
       email: form.email,
       password: form.password,
     });
