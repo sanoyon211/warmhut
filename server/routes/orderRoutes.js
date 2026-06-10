@@ -13,7 +13,7 @@ const generateOrderId = () => {
 // @access  Public
 router.post('/', async (req, res) => {
   try {
-    const { customer, items, payment, financials } = req.body;
+    const { userId, customer, items, payment, financials } = req.body;
 
     // Basic validation
     if (!customer || !items || items.length === 0 || !financials) {
@@ -24,6 +24,7 @@ router.post('/', async (req, res) => {
 
     const newOrder = new Order({
       orderId,
+      userId,
       customer,
       items,
       payment,
@@ -53,6 +54,19 @@ router.get('/', async (req, res) => {
     res.json(orders);
   } catch (error) {
     console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @route   GET /api/orders/user/:userId
+// @desc    Get all orders for a specific user
+// @access  Public (for now)
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 });

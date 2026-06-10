@@ -39,3 +39,25 @@ export const createOrder = async (orderData) => {
     throw error;
   }
 };
+
+export const getUserOrders = async (userId) => {
+  try {
+    const response = await fetch(`${API_BASE}/orders/user/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch user orders');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    return [];
+  }
+};
+
+export const getAllOrders = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/orders`);
+    if (!response.ok) throw new Error('Failed to fetch all orders');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching all orders:', error);
+    return [];
+  }
+};

@@ -17,6 +17,9 @@ import SignUpPage from '../SignInUp/SignUpPage';
 import Verify from '../SignInUp/Verify';
 import CreateNew from '../SignInUp/CreateNew';
 import Sucessfull from '../SignInUp/Sucessfull';
+import ProtectedRoute from '../components/ProtectedRoute';
+import UserDashboard from '../pages/Dashboard/UserDashboard';
+import AdminDashboard from '../pages/Dashboard/AdminDashboard';
 
 const router = createBrowserRouter([
   {
@@ -39,6 +42,22 @@ const router = createBrowserRouter([
       { path: 'verify', element: <Verify /> },
       { path: 'create-new', element: <CreateNew /> },
       { path: 'successfull', element: <Sucessfull /> },
+      { 
+        path: 'dashboard', 
+        element: (
+          <ProtectedRoute>
+            <UserDashboard />
+          </ProtectedRoute>
+        ) 
+      },
+      { 
+        path: 'admin', 
+        element: (
+          <ProtectedRoute adminOnly={true}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        ) 
+      },
       { path: '*', element: <NotFound /> },
     ],
   },

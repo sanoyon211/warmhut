@@ -45,6 +45,11 @@ export const auth = betterAuth({
             address: {
                 type: "string",
                 required: false
+            },
+            role: {
+                type: "string",
+                required: false,
+                defaultValue: "user"
             }
         }
     }

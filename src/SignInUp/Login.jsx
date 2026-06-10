@@ -33,7 +33,7 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     await signIn.social({
       provider: 'google',
-      callbackURL: '/',
+      callbackURL: window.location.origin + '/',
     });
   };
 

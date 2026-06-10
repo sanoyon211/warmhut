@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router';
+import { useSession } from '../lib/auth-client';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { createOrder } from '../lib/api';
@@ -9,6 +10,7 @@ import { BsTruck, BsCashCoin } from 'react-icons/bs';
 
 const Checkout = () => {
   const location = useLocation();
+  const { data: session } = useSession();
   const { cartItems, totalPrice, clearCart } = useCart();
   const { showToast } = useToast();
 
@@ -48,6 +50,7 @@ const Checkout = () => {
     
     try {
       const orderPayload = {
+        userId: session?.user?.id || null,
         customer: {
           name: form.name,
           phone: form.phone,
