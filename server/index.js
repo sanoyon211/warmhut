@@ -8,6 +8,7 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
 import promoRoutes from "./routes/promoRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/promo", promoRoutes);
+app.use("/api/contact", contactRoutes);
 
 // Default route for testing
 app.get("/", (req, res) => {

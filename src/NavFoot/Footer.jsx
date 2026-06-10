@@ -68,6 +68,7 @@ const Footer = () => {
                   { label: 'FAQ', to: '/faq' },
                   { label: 'Return & Refund Policy', to: '/return-policy' },
                   { label: 'Delivery Policy', to: '/faq' },
+                  { label: 'Contact Us', to: '/contact' },
                   { label: 'Terms & Conditions', to: '#' },
                 ].map(item => (
                   <Link key={item.label} to={item.to} className="block">
@@ -96,11 +97,6 @@ const Footer = () => {
                   </button>
                 </div>
               </form>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-400"><span className="text-gray-300 font-medium">📍</span> Dhaka, Bangladesh</p>
-                <p className="text-sm text-gray-400"><span className="text-gray-300 font-medium">📞</span> 01715825331</p>
-                <p className="text-sm text-gray-400"><span className="text-gray-300 font-medium">✉️</span> warmhutbd@gmail.com</p>
-              </div>
             </div>
           </div>
         </div>

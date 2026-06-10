@@ -18,6 +18,7 @@ import AdminDashboard from '../pages/Dashboard/AdminDashboard';
 import SearchResults from '../pages/SearchResults';
 import FAQ from '../pages/FAQ';
 import ReturnPolicy from '../pages/ReturnPolicy';
+import ContactUs from '../pages/ContactUs';
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
       { path: 'search', element: <SearchResults /> },
       { path: 'faq', element: <FAQ /> },
       { path: 'return-policy', element: <ReturnPolicy /> },
+      { path: 'contact', element: <ContactUs /> },
       { path: 'product', element: <ProductDetail /> },
       { path: 'checkout', element: <Checkout /> },
       { path: 'wishlist', element: <WishlistPage /> },

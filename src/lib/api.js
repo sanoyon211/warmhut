@@ -154,3 +154,42 @@ export const validatePromo = async (code) => {
     throw error;
   }
 };
+
+export const submitContact = async (contactData) => {
+  try {
+    const response = await fetch(`${API_BASE}/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contactData)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to submit message');
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllContacts = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/contact`);
+    if (!response.ok) throw new Error('Failed to fetch contacts');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching contacts:', error);
+    return [];
+  }
+};
+
+export const markContactRead = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE}/contact/${id}/read`, {
+      method: 'PATCH'
+    });
+    if (!response.ok) throw new Error('Failed to mark as read');
+    return await response.json();
+  } catch (error) {
+    console.error('Error marking contact read:', error);
+    throw error;
+  }
+};

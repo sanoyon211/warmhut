@@ -1,0 +1,58 @@
+import express from 'express';
+import Contact from '../models/Contact.js';
+
+const router = express.Router();
+
+// @route   POST /api/contact
+// @desc    Submit a new contact message
+// @access  Public
+router.post('/', async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ message: 'Please fill in all fields' });
+    }
+
+    const newContact = new Contact({ name, email, subject, message });
+    await newContact.save();
+
+    res.status(201).json({ message: 'Message sent successfully!' });
+  } catch (error) {
+    console.error('Error submitting contact form:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @route   GET /api/contact
+// @desc    Get all contact messages
+// @access  Public (Should be protected for Admin)
+router.get('/', async (req, res) => {
+  try {
+    const messages = await Contact.find().sort({ createdAt: -1 });
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @route   PATCH /api/contact/:id/read
+// @desc    Mark a message as read
+// @access  Public (Should be protected for Admin)
+router.patch('/:id/read', async (req, res) => {
+  try {
+    const message = await Contact.findById(req.params.id);
+    if (!message) return res.status(404).json({ message: 'Message not found' });
+
+    message.status = 'read';
+    await message.save();
+
+    res.json({ message: 'Marked as read', data: message });
+  } catch (error) {
+    console.error('Error updating message status:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+export default router;
