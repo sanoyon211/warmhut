@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
-import { getAllOrders, getAllContacts, markContactRead } from '../../lib/api';
+import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct } from '../../lib/api';
 import { useNavigate } from 'react-router';
-import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck } from 'react-icons/fi';
+import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
+import { useToast } from '../../context/ToastContext';
 
 const AdminDashboard = () => {
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'messages'
+  const { showToast } = useToast();
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'messages', 'products'
   
   const [orders, setOrders] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Product Modal State
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productForm, setProductForm] = useState({ name: '', price: '', category: '', color: '', image: '', stock: '' });
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [ordersData, messagesData] = await Promise.all([
+      const [ordersData, messagesData, productsData] = await Promise.all([
         getAllOrders(),
-        getAllContacts()
+        getAllContacts(),
+        fetchProducts({ limit: 1000 }) // Fetch all for admin
       ]);
       setOrders(ordersData);
       setMessages(messagesData);
+      setProducts(productsData.products || []);
       setLoading(false);
     };
     fetchData();
@@ -34,6 +44,52 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleProductSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingProduct) {
+        const updated = await updateProduct(editingProduct._id, productForm);
+        setProducts(products.map(p => p._id === updated._id ? updated : p));
+        showToast('Product updated!', 'success');
+      } else {
+        const created = await createProduct(productForm);
+        setProducts([created, ...products]);
+        showToast('Product created!', 'success');
+      }
+      setShowProductModal(false);
+      setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '' });
+      setEditingProduct(null);
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    try {
+      await deleteProduct(id);
+      setProducts(products.filter(p => p._id !== id));
+      showToast('Product deleted!', 'success');
+    } catch (error) {
+      showToast('Failed to delete product', 'error');
+    }
+  };
+
+  const openEditModal = (product) => {
+    setEditingProduct(product);
+    setProductForm({
+      name: product.name, price: product.price, category: product.category,
+      color: product.color, image: product.image, stock: product.stock
+    });
+    setShowProductModal(true);
+  };
+
+  const openAddModal = () => {
+    setEditingProduct(null);
+    setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '' });
+    setShowProductModal(true);
   };
 
   const handleLogout = async () => {
@@ -104,7 +160,13 @@ const AdminDashboard = () => {
             onClick={() => setActiveTab('orders')}
             className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors ${activeTab === 'orders' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
           >
-            Manage Orders
+            Orders
+          </button>
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors ${activeTab === 'products' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+          >
+            Products
           </button>
           <button
             onClick={() => setActiveTab('messages')}
@@ -218,7 +280,120 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Products Tab */}
+        {activeTab === 'products' && (
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="font-black text-lg text-gray-900">Manage Products</h2>
+              <button 
+                onClick={openAddModal}
+                className="bg-olive text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-x-2 hover:bg-gray-900 transition-colors"
+              >
+                <FiPlus /> Add Product
+              </button>
+            </div>
+            
+            {loading ? (
+               <div className="flex justify-center py-20">
+                 <span className="w-8 h-8 border-4 border-olive/30 border-t-olive rounded-full animate-spin"></span>
+               </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-gray-600">
+                  <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-500">
+                    <tr>
+                      <th className="px-6 py-4">Image</th>
+                      <th className="px-6 py-4">Name</th>
+                      <th className="px-6 py-4">Category</th>
+                      <th className="px-6 py-4">Price</th>
+                      <th className="px-6 py-4">Stock</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {products.map(product => (
+                      <tr key={product._id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-4">
+                          <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-xl" />
+                        </td>
+                        <td className="px-6 py-4 font-bold text-gray-900">{product.name}</td>
+                        <td className="px-6 py-4 capitalize">{product.category}</td>
+                        <td className="px-6 py-4 font-black text-olive">৳{product.price}</td>
+                        <td className="px-6 py-4">{product.stock}</td>
+                        <td className="px-6 py-4 flex justify-end gap-x-2">
+                          <button onClick={() => openEditModal(product)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
+                            <FiEdit2 />
+                          </button>
+                          <button onClick={() => handleDeleteProduct(product._id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
+                            <FiTrash2 />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
+
+      {/* Product Modal */}
+      {showProductModal && (
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="font-black text-xl text-gray-900">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
+              <button onClick={() => setShowProductModal(false)} className="text-gray-400 hover:text-gray-900 bg-white p-2 rounded-full shadow-sm">
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleProductSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Product Name</label>
+                  <input type="text" required value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Price (৳)</label>
+                  <input type="number" required value={productForm.price} onChange={e => setProductForm({...productForm, price: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Stock</label>
+                  <input type="number" required value={productForm.stock} onChange={e => setProductForm({...productForm, stock: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Category</label>
+                  <select required value={productForm.category} onChange={e => setProductForm({...productForm, category: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none">
+                    <option value="">Select...</option>
+                    <option value="Caps">Caps</option>
+                    <option value="Hoodie">Hoodie</option>
+                    <option value="Dropshoulder Hoodie">Dropshoulder Hoodie</option>
+                    <option value="Sweatshirt">Sweatshirt</option>
+                    <option value="Shoes">Shoes</option>
+                    <option value="Wallet">Wallet</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Color</label>
+                  <input type="text" required value={productForm.color} onChange={e => setProductForm({...productForm, color: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" placeholder="e.g. black, olive" />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Image URL</label>
+                  <input type="url" required value={productForm.image} onChange={e => setProductForm({...productForm, image: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" placeholder="https://..." />
+                </div>
+              </div>
+              <div className="pt-4 flex justify-end gap-x-3">
+                <button type="button" onClick={() => setShowProductModal(false)} className="px-6 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200">Cancel</button>
+                <button type="submit" className="px-6 py-3 rounded-xl font-bold text-white bg-olive hover:bg-gray-900 transition-colors">
+                  {editingProduct ? 'Save Changes' : 'Create Product'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

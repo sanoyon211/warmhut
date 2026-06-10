@@ -193,3 +193,43 @@ export const markContactRead = async (id) => {
     throw error;
   }
 };
+
+export const createProduct = async (productData) => {
+  try {
+    const response = await fetch(`${API_BASE}/products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(productData)
+    });
+    if (!response.ok) throw new Error('Failed to create product');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateProduct = async (id, productData) => {
+  try {
+    const response = await fetch(`${API_BASE}/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(productData)
+    });
+    if (!response.ok) throw new Error('Failed to update product');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteProduct = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE}/products/${id}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete product');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};

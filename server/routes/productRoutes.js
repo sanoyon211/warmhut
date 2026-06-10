@@ -166,4 +166,36 @@ router.post('/:id/reviews', async (req, res) => {
   }
 });
 
+// @route   PUT /api/products/:id
+// @desc    Update a product
+// @access  Public (Should be Admin)
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+    if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
+    res.json(updatedProduct);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @route   DELETE /api/products/:id
+// @desc    Delete a product
+// @access  Public (Should be Admin)
+router.delete('/:id', async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 export default router;
