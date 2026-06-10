@@ -1,5 +1,6 @@
 import express from 'express';
 import Order from '../models/Order.js';
+import { sendOrderConfirmationEmail, sendOrderStatusEmail } from '../utils/sendEmail.js';
 
 const router = express.Router();
 
@@ -33,6 +34,9 @@ router.post('/', async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
+    
+    // Send email asynchronously (don't block the response)
+    sendOrderConfirmationEmail(savedOrder);
     
     res.status(201).json({
       success: true,
@@ -88,6 +92,12 @@ router.patch('/:id/status', async (req, res) => {
     );
 
     if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // Send status update email if status is shipped or delivered
+    if (status === 'Shipped' || status === 'Delivered') {
+      sendOrderStatusEmail(order);
+    }
+
     res.json(order);
   } catch (error) {
     console.error('Error updating order status:', error);

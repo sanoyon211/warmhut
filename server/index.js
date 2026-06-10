@@ -29,10 +29,24 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Middleware
+const allowedOrigins = [
+    process.env.FRONTEND_URL || "http://localhost:5173",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
-  credentials: true
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true, // Necessary for cookies (session)
 }));
+
 app.use(express.json());
 
 // Serve Static Uploads
