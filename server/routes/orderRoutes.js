@@ -71,4 +71,28 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
+// @route   PATCH /api/orders/:id/status
+// @desc    Update order status
+// @access  Public (Should be Admin)
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['Pending', 'Shipped', 'Delivered'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 export default router;

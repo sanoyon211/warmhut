@@ -233,3 +233,54 @@ export const deleteProduct = async (id) => {
     throw error;
   }
 };
+
+export const updateOrderStatus = async (id, status) => {
+  try {
+    const response = await fetch(`${API_BASE}/orders/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) throw new Error('Failed to update status');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getPromos = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/promo`);
+    if (!response.ok) throw new Error('Failed to fetch promos');
+    return await response.json();
+  } catch (error) {
+    return [];
+  }
+};
+
+export const createPromo = async (promoData) => {
+  try {
+    const response = await fetch(`${API_BASE}/promo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(promoData)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to create promo');
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deletePromo = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE}/promo/${id}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete promo');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};

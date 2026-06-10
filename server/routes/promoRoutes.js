@@ -47,4 +47,52 @@ router.post('/create-dev', async (req, res) => {
   }
 });
 
+// @route   GET /api/promo
+// @desc    Get all promo codes
+// @access  Public (Should be Admin)
+router.get('/', async (req, res) => {
+  try {
+    const promos = await PromoCode.find().sort({ createdAt: -1 });
+    res.json(promos);
+  } catch (error) {
+    console.error('Error fetching promos:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/promo
+// @desc    Create a new promo code
+// @access  Public (Should be Admin)
+router.post('/', async (req, res) => {
+  try {
+    const { code, discountPercent, expiryDate, isActive } = req.body;
+    const newPromo = new PromoCode({
+      code: code.toUpperCase(),
+      discountPercent,
+      expiryDate,
+      isActive: isActive !== undefined ? isActive : true
+    });
+    await newPromo.save();
+    res.status(201).json(newPromo);
+  } catch (error) {
+    if (error.code === 11000) return res.status(400).json({ message: 'Promo code already exists' });
+    console.error('Error creating promo:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/promo/:id
+// @desc    Delete a promo code
+// @access  Public (Should be Admin)
+router.delete('/:id', async (req, res) => {
+  try {
+    const promo = await PromoCode.findByIdAndDelete(req.params.id);
+    if (!promo) return res.status(404).json({ message: 'Promo not found' });
+    res.json({ message: 'Promo deleted' });
+  } catch (error) {
+    console.error('Error deleting promo:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 export default router;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
-import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct } from '../../lib/api';
+import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo } from '../../lib/api';
 import { useNavigate } from 'react-router';
 import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
@@ -8,11 +8,12 @@ import { useToast } from '../../context/ToastContext';
 const AdminDashboard = () => {
   const { data: session } = useSession();
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'messages', 'products'
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'messages', 'products', 'promos'
   
   const [orders, setOrders] = useState([]);
   const [messages, setMessages] = useState([]);
   const [products, setProducts] = useState([]);
+  const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -24,18 +25,58 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [ordersData, messagesData, productsData] = await Promise.all([
+      const [ordersData, messagesData, productsData, promosData] = await Promise.all([
         getAllOrders(),
         getAllContacts(),
-        fetchProducts({ limit: 1000 }) // Fetch all for admin
+        fetchProducts({ limit: 1000 }),
+        getPromos()
       ]);
       setOrders(ordersData);
       setMessages(messagesData);
       setProducts(productsData.products || []);
+      setPromos(promosData);
       setLoading(false);
     };
     fetchData();
   }, []);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const updated = await updateOrderStatus(orderId, newStatus);
+      setOrders(orders.map(o => o._id === orderId ? { ...o, status: updated.status } : o));
+      showToast('Order status updated!', 'success');
+    } catch (error) {
+      showToast('Failed to update status', 'error');
+    }
+  };
+
+  const handleCreatePromo = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const code = fd.get('code');
+    const discountPercent = Number(fd.get('discountPercent'));
+    const expiryDate = fd.get('expiryDate');
+
+    try {
+      const created = await createPromo({ code, discountPercent, expiryDate });
+      setPromos([created, ...promos]);
+      e.target.reset();
+      showToast('Promo created!', 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  const handleDeletePromo = async (id) => {
+    if(!window.confirm('Delete this promo code?')) return;
+    try {
+      await deletePromo(id);
+      setPromos(promos.filter(p => p._id !== id));
+      showToast('Promo deleted!', 'success');
+    } catch (error) {
+      showToast('Failed to delete promo', 'error');
+    }
+  };
 
   const handleMarkRead = async (id) => {
     try {
@@ -169,6 +210,12 @@ const AdminDashboard = () => {
             Products
           </button>
           <button
+            onClick={() => setActiveTab('promos')}
+            className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors ${activeTab === 'promos' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+          >
+            Promo Codes
+          </button>
+          <button
             onClick={() => setActiveTab('messages')}
             className={`px-6 py-3 rounded-2xl font-bold text-sm transition-colors flex items-center gap-x-2 ${activeTab === 'messages' ? 'bg-olive text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
           >
@@ -215,11 +262,17 @@ const AdminDashboard = () => {
                         <td className="px-6 py-4">{new Date(order.createdAt).toLocaleDateString()}</td>
                         <td className="px-6 py-4 font-black text-olive">৳{order.financials.grandTotal}</td>
                         <td className="px-6 py-4">
-                          <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider
-                            ${order.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' : 
-                              order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                            {order.status}
-                          </span>
+                          <select 
+                            value={order.status}
+                            onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                            className={`text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider outline-none cursor-pointer border
+                              ${order.status === 'Pending' ? 'bg-yellow-50 border-yellow-200 text-yellow-700' : 
+                                order.status === 'Delivered' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                          </select>
                         </td>
                       </tr>
                     ))}
@@ -334,6 +387,71 @@ const AdminDashboard = () => {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Promos Tab */}
+        {activeTab === 'promos' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                <h3 className="font-black text-lg text-gray-900 mb-4">Create Promo Code</h3>
+                <form onSubmit={handleCreatePromo} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">Promo Code</label>
+                    <input type="text" name="code" required className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none uppercase" placeholder="e.g. WINTER50" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">Discount (%)</label>
+                    <input type="number" name="discountPercent" required min="1" max="100" className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" placeholder="20" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">Expiry Date</label>
+                    <input type="date" name="expiryDate" required className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" />
+                  </div>
+                  <button type="submit" className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-olive transition-colors">
+                    Create Code
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100">
+                  <h3 className="font-black text-lg text-gray-900">Active Promos</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm text-gray-600">
+                    <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-500">
+                      <tr>
+                        <th className="px-6 py-4">Code</th>
+                        <th className="px-6 py-4">Discount</th>
+                        <th className="px-6 py-4">Expires</th>
+                        <th className="px-6 py-4 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {promos.map(promo => (
+                        <tr key={promo._id} className="hover:bg-gray-50/50">
+                          <td className="px-6 py-4 font-black text-gray-900">{promo.code}</td>
+                          <td className="px-6 py-4 font-bold text-olive">{promo.discountPercent}%</td>
+                          <td className="px-6 py-4">{new Date(promo.expiryDate).toLocaleDateString()}</td>
+                          <td className="px-6 py-4 flex justify-end">
+                            <button onClick={() => handleDeletePromo(promo._id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
+                              <FiTrash2 />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {promos.length === 0 && (
+                    <div className="text-center py-10 text-gray-400">No active promo codes.</div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
