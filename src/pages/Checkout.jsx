@@ -51,6 +51,7 @@ const Checkout = () => {
   });
 
   const [payMethod, setPayMethod] = useState('cod');
+  const [bKashTrxId, setbKashTrxId] = useState('');
   const [placing, setPlacing] = useState(false);
   const [step, setStep] = useState(1); // 1: form, 2: success
   const [orderId, setOrderId] = useState('');
@@ -78,6 +79,10 @@ const Checkout = () => {
       showToast('⚠️ Please fill all required fields!', 'error');
       return;
     }
+    if (payMethod === 'bkash' && !bKashTrxId.trim()) {
+      showToast('⚠️ Please enter the bKash Transaction ID!', 'error');
+      return;
+    }
     setPlacing(true);
     
     try {
@@ -91,7 +96,7 @@ const Checkout = () => {
           note: form.note
         },
         items: checkoutItems,
-        payment: payMethod,
+        payment: { method: payMethod, trxId: payMethod === 'bkash' ? bKashTrxId.trim() : undefined },
         financials: {
           subtotal,
           deliveryFee: delivery,
@@ -304,6 +309,27 @@ const Checkout = () => {
                   </button>
                 ))}
               </div>
+
+              {payMethod === 'bkash' && (
+                <div className="mt-4 p-4 bg-pink-50 border border-pink-100 rounded-2xl">
+                  <p className="text-sm font-bold text-gray-900 mb-2">Instructions:</p>
+                  <ol className="text-xs text-gray-600 list-decimal list-inside space-y-1 mb-4">
+                    <li>Go to your bKash app.</li>
+                    <li>Send Money or Make Payment to <strong>01715825331</strong></li>
+                    <li>Enter amount: <strong>BDT {total}TK</strong></li>
+                    <li>Copy the Transaction ID (TrxID) and paste it below.</li>
+                  </ol>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">bKash Transaction ID *</label>
+                  <input
+                    type="text"
+                    value={bKashTrxId}
+                    onChange={e => setbKashTrxId(e.target.value)}
+                    placeholder="e.g. 8N51ABCDEF"
+                    className="w-full px-4 py-3 border border-pink-200 rounded-xl text-sm focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 bg-white"
+                    required
+                  />
+                </div>
+              )}
             </div>
           </div>
 

@@ -1,6 +1,8 @@
 import express from 'express';
 import Order from '../models/Order.js';
+import Product from '../models/Product.js';
 import { sendOrderConfirmationEmail, sendOrderStatusEmail } from '../utils/sendEmail.js';
+import { requireAdmin, requireAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -17,8 +19,34 @@ router.post('/', async (req, res) => {
     const { userId, customer, items, payment, financials } = req.body;
 
     // Basic validation
-    if (!customer || !items || items.length === 0 || !financials) {
+    if (!customer || !items || items.length === 0 || !financials || !payment || !payment.method) {
       return res.status(400).json({ message: 'Missing required order fields' });
+    }
+
+    if (payment.method === 'bkash' && !payment.trxId) {
+      return res.status(400).json({ message: 'Transaction ID is required for bKash payments' });
+    }
+
+    // Advanced Validation: Check stock and prices
+    let calculatedSubtotal = 0;
+    for (const item of items) {
+      const dbProduct = await Product.findById(item.id || item.productId);
+      if (!dbProduct) {
+        return res.status(400).json({ message: `Product ${item.name} no longer exists.` });
+      }
+      if (dbProduct.stock < item.qty) {
+        return res.status(400).json({ message: `Insufficient stock for ${item.name}. Available: ${dbProduct.stock}` });
+      }
+      // Compare prices (allowing small floating point discrepancies if any, but better to enforce exact match)
+      if (dbProduct.price !== item.price) {
+        return res.status(400).json({ message: `Price mismatch for ${item.name}. Please refresh your cart.` });
+      }
+      calculatedSubtotal += (dbProduct.price * item.qty);
+    }
+
+    // Optional: Could validate calculatedSubtotal matches financials.subtotal
+    if (Math.abs(calculatedSubtotal - financials.subtotal) > 1) {
+       return res.status(400).json({ message: 'Subtotal calculation mismatch. Please try again.' });
     }
 
     const orderId = generateOrderId();
@@ -35,6 +63,13 @@ router.post('/', async (req, res) => {
 
     const savedOrder = await newOrder.save();
     
+    // Reduce stock
+    for (const item of items) {
+      await Product.findByIdAndUpdate(item.id || item.productId, {
+        $inc: { stock: -item.qty }
+      });
+    }
+
     // Send email asynchronously (don't block the response)
     sendOrderConfirmationEmail(savedOrder);
     
@@ -51,8 +86,8 @@ router.post('/', async (req, res) => {
 
 // @route   GET /api/orders
 // @desc    Get all orders (Admin only ideally)
-// @access  Public (for now)
-router.get('/', async (req, res) => {
+// @access  Private/Admin
+router.get('/', requireAdmin, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.json(orders);
@@ -64,9 +99,13 @@ router.get('/', async (req, res) => {
 
 // @route   GET /api/orders/user/:userId
 // @desc    Get all orders for a specific user
-// @access  Public (for now)
-router.get('/user/:userId', async (req, res) => {
+// @access  Private
+router.get('/user/:userId', requireAuth, async (req, res) => {
   try {
+    // Only allow users to fetch their own orders, or admin to fetch any
+    if (req.user.id !== req.params.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
     const orders = await Order.find({ userId: req.params.userId }).sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
@@ -77,8 +116,8 @@ router.get('/user/:userId', async (req, res) => {
 
 // @route   PATCH /api/orders/:id/status
 // @desc    Update order status
-// @access  Public (Should be Admin)
-router.patch('/:id/status', async (req, res) => {
+// @access  Private/Admin
+router.patch('/:id/status', requireAdmin, async (req, res) => {
   try {
     const { status } = req.body;
     if (!['Pending', 'Shipped', 'Delivered'].includes(status)) {

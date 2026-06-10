@@ -116,3 +116,45 @@ export const sendOrderStatusEmail = async (order) => {
     console.error('Error sending order status email:', error);
   }
 };
+
+export const sendContactNotificationEmail = async (contact) => {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log('Email configuration missing. Skipping contact notification email.');
+    return;
+  }
+
+  const { name, email, subject, message } = contact;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+      <h2 style="color: #6B705C;">New Contact Message</h2>
+      <p>You have received a new message from the WarmHut contact form.</p>
+      
+      <div style="margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+        <p style="margin: 5px 0;"><strong>Name:</strong> ${name}</p>
+        <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+        <p style="margin: 5px 0;"><strong>Subject:</strong> ${subject}</p>
+      </div>
+      
+      <h3 style="margin-top: 20px; color: #6B705C;">Message:</h3>
+      <p style="background-color: #f1f1f1; padding: 15px; border-radius: 8px; white-space: pre-wrap;">${message}</p>
+      
+      <p style="margin-top: 30px; font-size: 12px; color: #777;">This is an automated notification from WarmHut.</p>
+    </div>
+  `;
+
+  const mailOptions = {
+    from: `"WarmHut System" <${process.env.SMTP_USER}>`,
+    to: process.env.SMTP_USER, // Send to the admin's email
+    replyTo: email,
+    subject: `New Contact Form Submission: ${subject}`,
+    html,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Contact notification email sent to admin`);
+  } catch (error) {
+    console.error('Error sending contact notification email:', error);
+  }
+};

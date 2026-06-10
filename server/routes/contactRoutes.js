@@ -1,5 +1,7 @@
 import express from 'express';
 import Contact from '../models/Contact.js';
+import { requireAdmin } from '../middleware/authMiddleware.js';
+import { sendContactNotificationEmail } from '../utils/sendEmail.js';
 
 const router = express.Router();
 
@@ -17,6 +19,9 @@ router.post('/', async (req, res) => {
     const newContact = new Contact({ name, email, subject, message });
     await newContact.save();
 
+    // Send email to admin asynchronously
+    sendContactNotificationEmail(newContact);
+
     res.status(201).json({ message: 'Message sent successfully!' });
   } catch (error) {
     console.error('Error submitting contact form:', error);
@@ -26,8 +31,8 @@ router.post('/', async (req, res) => {
 
 // @route   GET /api/contact
 // @desc    Get all contact messages
-// @access  Public (Should be protected for Admin)
-router.get('/', async (req, res) => {
+// @access  Private/Admin
+router.get('/', requireAdmin, async (req, res) => {
   try {
     const messages = await Contact.find().sort({ createdAt: -1 });
     res.json(messages);
@@ -39,8 +44,8 @@ router.get('/', async (req, res) => {
 
 // @route   PATCH /api/contact/:id/read
 // @desc    Mark a message as read
-// @access  Public (Should be protected for Admin)
-router.patch('/:id/read', async (req, res) => {
+// @access  Private/Admin
+router.patch('/:id/read', requireAdmin, async (req, res) => {
   try {
     const message = await Contact.findById(req.params.id);
     if (!message) return res.status(404).json({ message: 'Message not found' });

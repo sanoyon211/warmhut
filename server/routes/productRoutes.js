@@ -1,5 +1,6 @@
 import express from 'express';
 import Product from '../models/Product.js';
+import { requireAdmin, requireAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -113,8 +114,8 @@ router.get('/related/:id', async (req, res) => {
 
 // @route   POST /api/products
 // @desc    Create a product
-// @access  Public (Should be Admin in production)
-router.post('/', async (req, res) => {
+// @access  Private/Admin
+router.post('/', requireAdmin, async (req, res) => {
   try {
     const { name, price, category, color, image, stock } = req.body;
 
@@ -137,12 +138,13 @@ router.post('/', async (req, res) => {
 
 // @route   POST /api/products/:id/reviews
 // @desc    Add a review to a product
-// @access  Public (should be protected normally, but client provides userId)
-router.post('/:id/reviews', async (req, res) => {
+// @access  Private
+router.post('/:id/reviews', requireAuth, async (req, res) => {
   try {
-    const { userId, name, rating, comment } = req.body;
+    const { name, rating, comment } = req.body;
+    const userId = req.user.id;
     
-    if (!userId || !name || !rating || !comment) {
+    if (!name || !rating || !comment) {
       return res.status(400).json({ message: 'Please provide all review fields' });
     }
 
@@ -168,8 +170,8 @@ router.post('/:id/reviews', async (req, res) => {
 
 // @route   PUT /api/products/:id
 // @desc    Update a product
-// @access  Public (Should be Admin)
-router.put('/:id', async (req, res) => {
+// @access  Private/Admin
+router.put('/:id', requireAdmin, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
@@ -186,8 +188,8 @@ router.put('/:id', async (req, res) => {
 
 // @route   DELETE /api/products/:id
 // @desc    Delete a product
-// @access  Public (Should be Admin)
-router.delete('/:id', async (req, res) => {
+// @access  Private/Admin
+router.delete('/:id', requireAdmin, async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });

@@ -97,9 +97,11 @@ const CartDrawer = () => {
                 Add BDT {1000 - totalPrice}TK more for FREE delivery! 🚚
               </p>
             )}
-            <button className="w-full py-4 bg-olive text-white rounded-2xl font-bold text-sm hover:bg-gray-900 transition-colors duration-200 shadow-lg shadow-olive/20">
-              Proceed to Checkout →
-            </button>
+            <Link to="/checkout" onClick={() => setIsCartOpen(false)}>
+              <button className="w-full py-4 bg-olive text-white rounded-2xl font-bold text-sm hover:bg-gray-900 transition-colors duration-200 shadow-lg shadow-olive/20">
+                Proceed to Checkout →
+              </button>
+            </Link>
             <button onClick={clearCart} className="w-full py-2 text-xs text-gray-400 hover:text-red-400 transition-colors">
               Clear all items
             </button>

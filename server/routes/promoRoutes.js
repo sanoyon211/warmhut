@@ -1,5 +1,6 @@
 import express from 'express';
 import PromoCode from '../models/PromoCode.js';
+import { requireAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -49,8 +50,8 @@ router.post('/create-dev', async (req, res) => {
 
 // @route   GET /api/promo
 // @desc    Get all promo codes
-// @access  Public (Should be Admin)
-router.get('/', async (req, res) => {
+// @access  Private/Admin
+router.get('/', requireAdmin, async (req, res) => {
   try {
     const promos = await PromoCode.find().sort({ createdAt: -1 });
     res.json(promos);
@@ -62,8 +63,8 @@ router.get('/', async (req, res) => {
 
 // @route   POST /api/promo
 // @desc    Create a new promo code
-// @access  Public (Should be Admin)
-router.post('/', async (req, res) => {
+// @access  Private/Admin
+router.post('/', requireAdmin, async (req, res) => {
   try {
     const { code, discountPercent, expiryDate, isActive } = req.body;
     const newPromo = new PromoCode({
@@ -83,8 +84,8 @@ router.post('/', async (req, res) => {
 
 // @route   DELETE /api/promo/:id
 // @desc    Delete a promo code
-// @access  Public (Should be Admin)
-router.delete('/:id', async (req, res) => {
+// @access  Private/Admin
+router.delete('/:id', requireAdmin, async (req, res) => {
   try {
     const promo = await PromoCode.findByIdAndDelete(req.params.id);
     if (!promo) return res.status(404).json({ message: 'Promo not found' });

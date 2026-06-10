@@ -27,9 +27,15 @@ const orderSchema = new mongoose.Schema({
     }
   ],
   payment: {
-    type: String,
-    required: true,
-    enum: ['cod', 'bkash']
+    method: {
+      type: String,
+      required: true,
+      enum: ['cod', 'bkash']
+    },
+    trxId: {
+      type: String,
+      required: function() { return this.payment.method === 'bkash'; }
+    }
   },
   financials: {
     subtotal: { type: Number, required: true },
