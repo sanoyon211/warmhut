@@ -13,9 +13,23 @@ export const fetchProducts = async (category = '', color = '') => {
       throw new Error('Failed to fetch products');
     }
     return await response.json();
+export const fetchProducts = async (params = {}) => {
+  try {
+    const query = new URLSearchParams();
+    if (params.category) query.append('category', params.category);
+    if (params.color && params.color !== 'all') query.append('color', params.color);
+    if (params.minPrice) query.append('minPrice', params.minPrice);
+    if (params.maxPrice) query.append('maxPrice', params.maxPrice);
+    if (params.sort) query.append('sort', params.sort);
+    if (params.page) query.append('page', params.page);
+    if (params.limit) query.append('limit', params.limit);
+
+    const response = await fetch(`${API_BASE}/products?${query.toString()}`);
+    if (!response.ok) throw new Error('Failed to fetch products');
+    return await response.json();
   } catch (error) {
-    console.error('Error fetching products:', error);
-    return [];
+    console.error('API Error:', error);
+    return { products: [], totalPages: 1, currentPage: 1, totalProducts: 0 };
   }
 };
 
