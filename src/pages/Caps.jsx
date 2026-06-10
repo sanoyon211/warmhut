@@ -1,48 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductPageLayout from '../components/ProductPageLayout';
 import ProductGrid from '../components/ProductGrid';
-
-// Import all cap images
-import CapBlack from '../assets/Caps/BASEBALL UNISEX - Cap - jet black.webp';
-import Capdeep from '../assets/Caps/BASEBALL UNISEX - Cap - deep depths.webp';
-import Capespresso from '../assets/Caps/BASEBALL UNISEX - Cap - espresso.webp';
-import Capgray from '../assets/Caps/BASEBALL UNISEX - Cap - grey taupe.webp';
-import White from '../assets/Caps/white.webp';
-import GrayStone from '../assets/Caps/grayStone.webp';
-import HufStone from '../assets/Caps/Huf stone.webp';
-import HufBlack from '../assets/Caps/Huf black.webp';
-import NikeWhite from '../assets/Caps/Nike Sportswear(white).webp';
-import PumaBlack from '../assets/Caps/Puma Black.webp';
-import UniversalGray from '../assets/Caps/Tommy Hilfiger(Universal Gray).webp';
-
-const allCaps = [
-  { img: CapBlack, name: 'Lyle & Scott Cap (Jet Black)', price: 'BDT 350TK', color: 'black' },
-  { img: Capdeep, name: 'Lyle & Scott Cap (Deep Depths)', price: 'BDT 350TK', color: 'gray' },
-  { img: Capespresso, name: 'Lyle & Scott Cap (Espresso)', price: 'BDT 350TK', color: 'brown' },
-  { img: Capgray, name: 'Lyle & Scott Cap (Grey Taupe)', price: 'BDT 350TK', color: 'gray' },
-  { img: White, name: 'Lyle & Scott Cap (White)', price: 'BDT 350TK', color: 'white' },
-  { img: GrayStone, name: 'Lyle & Scott Cap (Gray Stone)', price: 'BDT 350TK', color: 'gray' },
-  { img: HufStone, name: 'HUF Cap (Stone)', price: 'BDT 350TK', color: 'gray' },
-  { img: HufBlack, name: 'HUF Cap (Black)', price: 'BDT 350TK', color: 'black' },
-  { img: NikeWhite, name: 'Nike Sportswear Cap (White)', price: 'BDT 350TK', color: 'white' },
-  { img: PumaBlack, name: 'Puma Cap (Black)', price: 'BDT 350TK', color: 'black' },
-  { img: UniversalGray, name: 'Tommy Hilfiger Cap (Universal Gray)', price: 'BDT 350TK', color: 'gray' },
-];
-
-const filters = [
-  { value: 'all', label: 'All Caps', count: allCaps.length },
-  { value: 'black', label: 'Black', count: allCaps.filter(c => c.color === 'black').length },
-  { value: 'white', label: 'White', count: allCaps.filter(c => c.color === 'white').length },
-  { value: 'gray', label: 'Gray', count: allCaps.filter(c => c.color === 'gray').length },
-  { value: 'brown', label: 'Brown', count: allCaps.filter(c => c.color === 'brown').length },
-];
+import { fetchProducts } from '../lib/api';
 
 const Caps = () => {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      const data = await fetchProducts('Caps');
+      setProducts(data);
+      setLoading(false);
+    };
+    loadProducts();
+  }, []);
 
   const filtered = activeFilter === 'all'
-    ? allCaps
-    : allCaps.filter(c => c.color === activeFilter);
+    ? products
+    : products.filter(c => c.color === activeFilter);
+
+  // Dynamically generate filters based on products
+  const filters = [
+    { value: 'all', label: 'All Caps', count: products.length },
+    { value: 'black', label: 'Black', count: products.filter(c => c.color === 'black').length },
+    { value: 'white', label: 'White', count: products.filter(c => c.color === 'white').length },
+    { value: 'gray', label: 'Gray', count: products.filter(c => c.color === 'gray').length },
+    { value: 'brown', label: 'Brown', count: products.filter(c => c.color === 'brown').length },
+  ];
 
   return (
     <ProductPageLayout
@@ -51,7 +38,13 @@ const Caps = () => {
       activeFilter={activeFilter}
       onFilterChange={setActiveFilter}
     >
-      <ProductGrid products={filtered} />
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <span className="w-10 h-10 border-4 border-olive/30 border-t-olive rounded-full animate-spin"></span>
+        </div>
+      ) : (
+        <ProductGrid products={filtered} />
+      )}
     </ProductPageLayout>
   );
 };

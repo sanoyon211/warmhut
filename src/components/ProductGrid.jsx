@@ -13,12 +13,12 @@ const ProductGrid = ({ products }) => {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
-      {products.map((product, index) => (
+      {products.map((product) => (
         <Card
-          key={`${product.subTitle}-${index}`}
-          id={`${product.subTitle}-${index}`.replace(/\s/g, '-')}
-          bgImg={product.img}
-          title={product.price}
+          key={product._id || product.id || product.name}
+          id={product._id || product.id || product.name.replace(/\s/g, '-')}
+          bgImg={product.image || product.img}
+          title={`BDT ${product.price}TK`}
           subTitle={product.name}
         />
       ))}
