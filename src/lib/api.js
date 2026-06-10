@@ -284,3 +284,21 @@ export const deletePromo = async (id) => {
     throw error;
   }
 };
+
+export const uploadImage = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch(`${API_BASE}/upload`, {
+      method: 'POST',
+      body: formData // Note: We do NOT set Content-Type header manually here; fetch sets it with boundary for FormData
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to upload image');
+    return data.imageUrl;
+  } catch (error) {
+    throw error;
+  }
+};

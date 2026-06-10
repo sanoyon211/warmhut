@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
-import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo } from '../../lib/api';
+import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage } from '../../lib/api';
 import { useNavigate } from 'react-router';
 import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
@@ -21,6 +21,8 @@ const AdminDashboard = () => {
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({ name: '', price: '', category: '', color: '', image: '', stock: '' });
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,19 +92,31 @@ const AdminDashboard = () => {
   const handleProductSubmit = async (e) => {
     e.preventDefault();
     try {
+      let finalImageUrl = productForm.image;
+      
+      if (imageFile) {
+        setUploadingImage(true);
+        finalImageUrl = await uploadImage(imageFile);
+        setUploadingImage(false);
+      }
+
+      const submissionData = { ...productForm, image: finalImageUrl };
+
       if (editingProduct) {
-        const updated = await updateProduct(editingProduct._id, productForm);
+        const updated = await updateProduct(editingProduct._id, submissionData);
         setProducts(products.map(p => p._id === updated._id ? updated : p));
         showToast('Product updated!', 'success');
       } else {
-        const created = await createProduct(productForm);
+        const created = await createProduct(submissionData);
         setProducts([created, ...products]);
         showToast('Product created!', 'success');
       }
       setShowProductModal(false);
       setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '' });
+      setImageFile(null);
       setEditingProduct(null);
     } catch (error) {
+      setUploadingImage(false);
       showToast(error.message, 'error');
     }
   };
@@ -124,12 +138,14 @@ const AdminDashboard = () => {
       name: product.name, price: product.price, category: product.category,
       color: product.color, image: product.image, stock: product.stock
     });
+    setImageFile(null);
     setShowProductModal(true);
   };
 
   const openAddModal = () => {
     setEditingProduct(null);
     setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '' });
+    setImageFile(null);
     setShowProductModal(true);
   };
 
@@ -498,13 +514,25 @@ const AdminDashboard = () => {
                   <input type="text" required value={productForm.color} onChange={e => setProductForm({...productForm, color: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" placeholder="e.g. black, olive" />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Image URL</label>
-                  <input type="url" required value={productForm.image} onChange={e => setProductForm({...productForm, image: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" placeholder="https://..." />
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Upload Product Image</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    required={!editingProduct} // Required only when adding new
+                    onChange={e => setImageFile(e.target.files[0])} 
+                    className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-olive/10 file:text-olive hover:file:bg-olive/20" 
+                  />
+                  {editingProduct && productForm.image && !imageFile && (
+                    <div className="mt-2 text-sm text-gray-500">
+                      Current: <img src={productForm.image} alt="Current" className="w-10 h-10 inline-block object-cover rounded-md ml-2" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="pt-4 flex justify-end gap-x-3">
                 <button type="button" onClick={() => setShowProductModal(false)} className="px-6 py-3 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200">Cancel</button>
-                <button type="submit" className="px-6 py-3 rounded-xl font-bold text-white bg-olive hover:bg-gray-900 transition-colors">
+                <button type="submit" disabled={uploadingImage} className="px-6 py-3 rounded-xl font-bold text-white bg-olive hover:bg-gray-900 transition-colors disabled:opacity-50 flex items-center gap-x-2">
+                  {uploadingImage ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : null}
                   {editingProduct ? 'Save Changes' : 'Create Product'}
                 </button>
               </div>
