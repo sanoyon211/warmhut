@@ -3,16 +3,26 @@ import { IoLogoYoutube } from 'react-icons/io5';
 import { FaFacebook, FaInstagram, FaTiktok } from 'react-icons/fa';
 import { Link } from 'react-router';
 import { useToast } from '../context/ToastContext';
+import { subscribeNewsletter } from '../lib/api';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
+  const [subscribing, setSubscribing] = useState(false);
   const { showToast } = useToast();
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email) return;
-    showToast('🎉 Successfully subscribed!');
-    setEmail('');
+    setSubscribing(true);
+    try {
+      const data = await subscribeNewsletter(email);
+      showToast(data.message || '🎉 Successfully subscribed!', 'success');
+      setEmail('');
+    } catch (error) {
+      showToast(error.message || 'Failed to subscribe. Maybe you are already subscribed?', 'error');
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   return (
@@ -92,8 +102,8 @@ const Footer = () => {
                     className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-olive transition-colors"
                     required
                   />
-                  <button type="submit" className="w-full py-2.5 bg-olive text-white rounded-xl text-sm font-semibold hover:bg-olive/80 transition-colors">
-                    Subscribe →
+                  <button type="submit" disabled={subscribing} className="w-full py-2.5 bg-olive text-white rounded-xl text-sm font-semibold hover:bg-olive/80 transition-colors disabled:opacity-50">
+                    {subscribing ? 'Subscribing...' : 'Subscribe →'}
                   </button>
                 </div>
               </form>

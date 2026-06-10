@@ -302,3 +302,18 @@ export const uploadImage = async (file) => {
     throw error;
   }
 };
+
+export const subscribeNewsletter = async (email) => {
+  try {
+    const response = await fetch(`${API_BASE}/newsletter`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to subscribe');
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
