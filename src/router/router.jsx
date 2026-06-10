@@ -26,6 +26,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'shop', element: <Shop title="All Products" /> },
       { path: 'caps', element: <Shop category="Caps" title="Caps Collection" /> },
       { path: 'dropshoulderhoodie', element: <Shop category="Dropshoulder Hoodie" title="Dropshoulder Hoodies" /> },
       { path: 'hoodie', element: <Shop category="Hoodie" title="Premium Hoodies" /> },

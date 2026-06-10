@@ -21,10 +21,10 @@ const seedProducts = [
   { name: "Tommy Hilfiger Cap (Universal Gray)", price: 350, category: "Caps", color: "gray", image: "/assets/Caps/Tommy Hilfiger(Universal Gray).webp", stock: 15 },
 
   // Dropshoulder Hoodie
-  { name: "Washed Dropshoulder Hoodie (Blue)", price: 1500, category: "DropshoulderHoodie", color: "blue", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-blue.jpg", stock: 20 },
-  { name: "Washed Dropshoulder Hoodie (Autumn)", price: 1500, category: "DropshoulderHoodie", color: "autumn", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-Autunm.jpg", stock: 20 },
-  { name: "Washed Dropshoulder Hoodie (Gray)", price: 1500, category: "DropshoulderHoodie", color: "gray", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-gray.jpg", stock: 20 },
-  { name: "Washed Dropshoulder Hoodie (Black)", price: 1500, category: "DropshoulderHoodie", color: "black", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-black.jpg", stock: 20 },
+  { name: "Washed Dropshoulder Hoodie (Blue)", price: 1500, category: "Dropshoulder Hoodie", color: "blue", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-blue.jpg", stock: 20 },
+  { name: "Washed Dropshoulder Hoodie (Autumn)", price: 1500, category: "Dropshoulder Hoodie", color: "autumn", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-Autunm.jpg", stock: 20 },
+  { name: "Washed Dropshoulder Hoodie (Gray)", price: 1500, category: "Dropshoulder Hoodie", color: "gray", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-gray.jpg", stock: 20 },
+  { name: "Washed Dropshoulder Hoodie (Black)", price: 1500, category: "Dropshoulder Hoodie", color: "black", image: "/assets/DropsholderHoodie/Washed-DropsholderHoodie-black.jpg", stock: 20 },
 
   // Hoodie
   { name: "SUPER Hoodie (Olive)", price: 1400, category: "Hoodie", color: "olive", image: "/assets/Hoodie/SUPER - Hoodie - olive.webp", stock: 25 },
@@ -39,10 +39,10 @@ const seedProducts = [
   { name: "Superstar II Trainers", price: 2500, category: "Shoes", color: "white", image: "/assets/Shoes/SUPERSTAR II  - Trainers.webp", stock: 10 },
 
   // Sweatshirts
-  { name: "Jack & Jones Sweatshirt", price: 750, category: "SweatShirt", color: "white", image: "/assets/Sweetshirt/Jack & Jonys -Sweet Shirt.webp", stock: 30 },
-  { name: "Sweatshirt (Black)", price: 650, category: "SweatShirt", color: "black", image: "/assets/Sweetshirt/Sweet Shirt -Black.webp", stock: 30 },
-  { name: "Sweatshirt (Gray)", price: 650, category: "SweatShirt", color: "gray", image: "/assets/Sweetshirt/Sweet Shirt -Gray.webp", stock: 30 },
-  { name: "Sweatshirt (Light Gray)", price: 650, category: "SweatShirt", color: "gray", image: "/assets/Sweetshirt/Sweet Shirt -Light Gray.webp", stock: 30 },
+  { name: "Jack & Jones Sweatshirt", price: 750, category: "Sweatshirt", color: "white", image: "/assets/Sweetshirt/Jack & Jonys -Sweet Shirt.webp", stock: 30 },
+  { name: "Sweatshirt (Black)", price: 650, category: "Sweatshirt", color: "black", image: "/assets/Sweetshirt/Sweet Shirt -Black.webp", stock: 30 },
+  { name: "Sweatshirt (Gray)", price: 650, category: "Sweatshirt", color: "gray", image: "/assets/Sweetshirt/Sweet Shirt -Gray.webp", stock: 30 },
+  { name: "Sweatshirt (Light Gray)", price: 650, category: "Sweatshirt", color: "gray", image: "/assets/Sweetshirt/Sweet Shirt -Light Gray.webp", stock: 30 },
 
   // Wallets
   { name: "Eton & Coin Set Wallet (Black)", price: 450, category: "Wallet", color: "black", image: "/assets/Wallet/ETON AND COIN SET - Wallet - black.webp", stock: 40 },

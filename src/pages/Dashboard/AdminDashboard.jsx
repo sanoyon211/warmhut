@@ -17,12 +17,13 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Product Modal State
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({ name: '', price: '', category: '', color: '', image: '', stock: '' });
   const [imageFile, setImageFile] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [isNewCategory, setIsNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,7 +101,9 @@ const AdminDashboard = () => {
         setUploadingImage(false);
       }
 
-      const submissionData = { ...productForm, image: finalImageUrl };
+      let finalCategory = isNewCategory ? newCategoryName : productForm.category;
+
+      const submissionData = { ...productForm, image: finalImageUrl, category: finalCategory };
 
       if (editingProduct) {
         const updated = await updateProduct(editingProduct._id, submissionData);
@@ -115,6 +118,8 @@ const AdminDashboard = () => {
       setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '' });
       setImageFile(null);
       setEditingProduct(null);
+      setIsNewCategory(false);
+      setNewCategoryName('');
     } catch (error) {
       setUploadingImage(false);
       showToast(error.message, 'error');
@@ -139,6 +144,8 @@ const AdminDashboard = () => {
       color: product.color, image: product.image, stock: product.stock
     });
     setImageFile(null);
+    setIsNewCategory(false);
+    setNewCategoryName('');
     setShowProductModal(true);
   };
 
@@ -146,6 +153,8 @@ const AdminDashboard = () => {
     setEditingProduct(null);
     setProductForm({ name: '', price: '', category: '', color: '', image: '', stock: '' });
     setImageFile(null);
+    setIsNewCategory(false);
+    setNewCategoryName('');
     setShowProductModal(true);
   };
 
@@ -499,15 +508,50 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Category</label>
-                  <select required value={productForm.category} onChange={e => setProductForm({...productForm, category: e.target.value})} className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none">
-                    <option value="">Select...</option>
-                    <option value="Caps">Caps</option>
-                    <option value="Hoodie">Hoodie</option>
-                    <option value="Dropshoulder Hoodie">Dropshoulder Hoodie</option>
-                    <option value="Sweatshirt">Sweatshirt</option>
-                    <option value="Shoes">Shoes</option>
-                    <option value="Wallet">Wallet</option>
-                  </select>
+                  {!isNewCategory ? (
+                    <select 
+                      required 
+                      value={productForm.category} 
+                      onChange={e => {
+                        if (e.target.value === 'NEW_CATEGORY') {
+                          setIsNewCategory(true);
+                          setProductForm({...productForm, category: ''});
+                        } else {
+                          setProductForm({...productForm, category: e.target.value});
+                        }
+                      }} 
+                      className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none"
+                    >
+                      <option value="">Select...</option>
+                      {/* Dynamic unique categories */}
+                      {[...new Set(products.map(p => p.category))].filter(Boolean).map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                      <option value="NEW_CATEGORY" className="font-bold text-olive">+ Add New Category</option>
+                    </select>
+                  ) : (
+                    <div className="flex gap-x-2">
+                      <input 
+                        type="text" 
+                        required 
+                        value={newCategoryName} 
+                        onChange={e => setNewCategoryName(e.target.value)} 
+                        className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none" 
+                        placeholder="e.g. T-Shirt" 
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          setIsNewCategory(false);
+                          setNewCategoryName('');
+                        }}
+                        className="bg-gray-100 text-gray-500 px-3 rounded-xl hover:bg-gray-200"
+                        title="Cancel new category"
+                      >
+                        <FiX />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-1">Color</label>

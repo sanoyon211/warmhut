@@ -9,11 +9,11 @@ import { useWishlist } from '../context/WishlistContext';
 import Logo from '../assets/logo.png';
 
 const navLinks = [
+  { to: '/shop', label: 'Shop All' },
   { to: '/caps', label: 'Caps' },
   { to: '/dropshoulderhoodie', label: 'Dropshoulder' },
   { to: '/hoodie', label: 'Hoodie' },
   { to: '/sweatshirt', label: 'Sweatshirt' },
-  { to: '/wallet', label: 'Wallet' },
   { to: '/shoes', label: 'Shoes' },
   { to: '/offers', label: '🔥 Offers', special: true },
 ];

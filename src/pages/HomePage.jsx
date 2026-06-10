@@ -3,6 +3,7 @@ import BgImg from '../components/BgImg';
 import Testimonials from '../components/Testimonials';
 import Newsletter from '../components/Newsletter';
 import {
+  NewArrivalsSection,
   CapsSection,
   HoodieSection,
   ShoesSection,
@@ -15,6 +16,7 @@ const HomePage = () => {
   return (
     <div>
       <BgImg />
+      <div data-aos="fade-up"><NewArrivalsSection /></div>
       <div data-aos="fade-up"><CapsSection /></div>
       <div data-aos="fade-up"><HoodieSection /></div>
       <div data-aos="fade-up"><ShoesSection /></div>
