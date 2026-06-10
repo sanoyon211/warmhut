@@ -1,12 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 import Layout from '../Layout/Layout';
 import HomePage from '../pages/HomePage';
-import Caps from '../pages/Caps';
-import DropshoulderHoodie from '../pages/DropshoulderHoodie';
-import Hoodie from '../pages/Hoodie';
-import SweatShirt from '../pages/SweatShirt';
-import Wallet from '../pages/Wallet';
-import Shoes from '../pages/Shoes';
+import Shop from '../pages/Shop';
 import OfferPage from '../pages/OfferPage';
 import NotFound from '../pages/NotFound';
 import ProductDetail from '../pages/ProductDetail';
@@ -30,12 +25,12 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'caps', element: <Caps /> },
-      { path: 'dropshoulderhoodie', element: <DropshoulderHoodie /> },
-      { path: 'hoodie', element: <Hoodie /> },
-      { path: 'sweatshirt', element: <SweatShirt /> },
-      { path: 'wallet', element: <Wallet /> },
-      { path: 'shoes', element: <Shoes /> },
+      { path: 'caps', element: <Shop category="Caps" title="Caps Collection" /> },
+      { path: 'dropshoulderhoodie', element: <Shop category="Dropshoulder Hoodie" title="Dropshoulder Hoodies" /> },
+      { path: 'hoodie', element: <Shop category="Hoodie" title="Premium Hoodies" /> },
+      { path: 'sweatshirt', element: <Shop category="Sweatshirt" title="Cozy Sweatshirts" /> },
+      { path: 'wallet', element: <Shop category="Wallet" title="Leather Wallets" /> },
+      { path: 'shoes', element: <Shop category="Shoes" title="Shoes & Sneakers" /> },
       { path: 'offers', element: <OfferPage /> },
       { path: 'search', element: <SearchResults /> },
       { path: 'faq', element: <FAQ /> },

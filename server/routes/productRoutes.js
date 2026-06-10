@@ -8,15 +8,40 @@ const router = express.Router();
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const { category, color } = req.query;
+    const { category, color, minPrice, maxPrice, sort, page = 1, limit = 12 } = req.query;
     
     // Build query object
     const query = {};
     if (category) query.category = category;
-    if (color) query.color = color;
+    if (color && color !== 'all') query.color = color;
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
 
-    const products = await Product.find(query).sort({ createdAt: -1 });
-    res.json(products);
+    // Sort configuration
+    let sortOptions = { createdAt: -1 }; // newest by default
+    if (sort === 'price_asc') sortOptions = { price: 1 };
+    else if (sort === 'price_desc') sortOptions = { price: -1 };
+
+    // Pagination configuration
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    const totalProducts = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNum);
+
+    res.json({
+      products,
+      currentPage: pageNum,
+      totalPages: Math.ceil(totalProducts / limitNum),
+      totalProducts
+    });
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Server Error' });
@@ -62,6 +87,26 @@ router.get('/:id', async (req, res) => {
     if (error.kind === 'ObjectId') {
       return res.status(404).json({ message: 'Product not found' });
     }
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// @route   GET /api/products/related/:id
+// @desc    Get related products by category
+// @access  Public
+router.get('/related/:id', async (req, res) => {
+  try {
+    const currentProduct = await Product.findById(req.params.id);
+    if (!currentProduct) return res.status(404).json({ message: 'Product not found' });
+
+    const relatedProducts = await Product.find({
+      category: currentProduct.category,
+      _id: { $ne: currentProduct._id } // Exclude the current product
+    }).limit(4);
+
+    res.json(relatedProducts);
+  } catch (error) {
+    console.error('Error fetching related products:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 });

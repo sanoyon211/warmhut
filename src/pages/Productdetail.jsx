@@ -4,7 +4,8 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useSession } from '../lib/auth-client';
-import { getProductById, addReview } from '../lib/api';
+import { getProductById, addReview, fetchRelatedProducts } from '../lib/api';
+import ProductGrid from '../components/ProductGrid';
 import { AiFillHeart } from 'react-icons/ai';
 import { FiHeart, FiShoppingCart, FiArrowLeft, FiShare2, FiCheck, FiUser } from 'react-icons/fi';
 import { BsStarFill, BsStarHalf, BsStar, BsShieldCheck, BsTruck, BsArrowRepeat } from 'react-icons/bs';
@@ -33,6 +34,9 @@ const ProductDetail = () => {
   const [reviewComment, setReviewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
 
+  // Related products
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
   useEffect(() => {
     if (initialProduct?.id) {
       getProductById(initialProduct.id).then(data => {
@@ -41,6 +45,9 @@ const ProductDetail = () => {
           data.id = data._id || data.id;
           setProduct(data);
         }
+      });
+      fetchRelatedProducts(initialProduct.id).then(data => {
+        setRelatedProducts(data);
       });
     }
   }, [initialProduct]);
@@ -493,6 +500,14 @@ const ProductDetail = () => {
             </div>
           )}
         </div>
+
+        {/* ── Related Products ── */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-20">
+            <h2 className="text-2xl font-black text-gray-900 mb-8 text-center">You May Also Like</h2>
+            <ProductGrid products={relatedProducts} />
+          </div>
+        )}
       </div>
     </div>
   );
