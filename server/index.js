@@ -18,6 +18,7 @@ import wishlistRoutes from "./routes/wishlistRoutes.js";
 import promoRoutes from "./routes/promoRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import newsletterRoutes from "./routes/newsletterRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 dotenv.config();
 
@@ -79,6 +80,15 @@ io.on('connection', (socket) => {
         io.to(productId).emit('viewersCount', io.sockets.adapter.rooms.get(productId)?.size || 0);
     });
 
+    // Chat Rooms
+    socket.on('joinChat', (userId) => {
+        socket.join(userId);
+    });
+
+    socket.on('joinAdminRoom', () => {
+        socket.join('adminRoom');
+    });
+
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
         if (currentRoom) {
@@ -109,6 +119,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/promo", promoRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/newsletter", newsletterRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Configure Cloudinary
 cloudinary.config({

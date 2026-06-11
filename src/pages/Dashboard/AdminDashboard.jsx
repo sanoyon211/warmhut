@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
-import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage } from '../../lib/api';
+import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage, getChatsAdmin, sendChatMessage } from '../../lib/api';
 import { useNavigate, Link } from 'react-router';
 import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
@@ -16,6 +16,10 @@ const AdminDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [products, setProducts] = useState([]);
   const [promos, setPromos] = useState([]);
+  const [chats, setChats] = useState([]);
+  const [activeChatId, setActiveChatId] = useState(null);
+  const [chatInput, setChatInput] = useState('');
+  const chatMessagesEndRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -30,22 +34,26 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [ordersData, messagesData, productsData, promosData] = await Promise.all([
+      const [ordersData, messagesData, productsData, promosData, chatsData] = await Promise.all([
         getAllOrders(),
         getAllContacts(),
         fetchProducts({ limit: 1000 }),
-        getPromos()
+        getPromos(),
+        getChatsAdmin().catch(() => [])
       ]);
       setOrders(ordersData);
       setMessages(messagesData);
       setProducts(productsData.products || []);
       setPromos(promosData);
+      setChats(chatsData);
       setLoading(false);
     };
     fetchData();
   }, []);
 
   useEffect(() => {
+    socket.emit('joinAdminRoom');
+
     socket.on('newOrder', (newOrder) => {
       setOrders((prev) => [newOrder, ...prev]);
       showToast('🔔 New order received!', 'info');
@@ -80,6 +88,25 @@ const AdminDashboard = () => {
       setPromos((prev) => prev.filter(p => p._id !== promoId));
     });
 
+    socket.on('newChatMessage', ({ userId, message, userName }) => {
+      setChats(prev => {
+        let existing = prev.find(c => c.userId === userId);
+        if (existing) {
+          const updated = {
+            ...existing,
+            messages: [...existing.messages, message],
+            unreadByAdmin: existing.unreadByAdmin + 1,
+            userName: userName || existing.userName
+          };
+          return [updated, ...prev.filter(c => c.userId !== userId)];
+        } else {
+          const newChat = { userId, userName: userName || 'Guest', messages: [message], unreadByAdmin: 1 };
+          return [newChat, ...prev];
+        }
+      });
+      showToast('💬 New live support message!', 'info');
+    });
+
     return () => {
       socket.off('newOrder');
       socket.off('orderStatusUpdated');
@@ -89,6 +116,7 @@ const AdminDashboard = () => {
       socket.off('productDeleted');
       socket.off('promoCreated');
       socket.off('promoDeleted');
+      socket.off('newChatMessage');
     };
   }, [showToast]);
 
@@ -101,6 +129,29 @@ const AdminDashboard = () => {
       showToast('Failed to update status', 'error');
     }
   };
+
+  const handleSendReply = async (e) => {
+    e.preventDefault();
+    if (!chatInput.trim() || !activeChatId) return;
+
+    try {
+      await sendChatMessage({
+        userId: activeChatId,
+        userName: 'Admin',
+        text: chatInput,
+        sender: 'admin'
+      });
+      setChatInput('');
+    } catch (error) {
+      showToast('Failed to send message', 'error');
+    }
+  };
+
+  useEffect(() => {
+    if (chatMessagesEndRef.current) {
+      chatMessagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chats, activeChatId]);
 
   const handleCreatePromo = async (e) => {
     e.preventDefault();
@@ -288,6 +339,23 @@ const AdminDashboard = () => {
             {messages.filter(m => m.status === 'unread').length > 0 && (
               <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
                 {messages.filter(m => m.status === 'unread').length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('live_chat')}
+            className={`w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 flex justify-between ${
+              activeTab === 'live_chat' ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+            }`}
+          >
+            <div className="flex items-center gap-x-3">
+              <FiMessageSquare className={`w-5 h-5 ${activeTab === 'live_chat' ? 'text-white' : 'text-gray-500'}`} />
+              Live Support
+            </div>
+            {chats.reduce((acc, c) => acc + c.unreadByAdmin, 0) > 0 && (
+              <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                {chats.reduce((acc, c) => acc + c.unreadByAdmin, 0)}
               </span>
             )}
           </button>
@@ -617,6 +685,88 @@ const AdminDashboard = () => {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Live Chat Tab */}
+        {activeTab === 'live_chat' && (
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex h-[600px]">
+            {/* Chat List */}
+            <div className="w-1/3 border-r border-gray-100 flex flex-col bg-gray-50">
+              <div className="p-4 border-b border-gray-200 bg-white">
+                <h3 className="font-black text-gray-900">Active Chats</h3>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                {chats.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-10">No active chats</p>
+                ) : (
+                  chats.map(chat => (
+                    <button 
+                      key={chat.userId}
+                      onClick={() => {
+                        setActiveChatId(chat.userId);
+                        // Optional: mark as read logic here
+                        setChats(prev => prev.map(c => c.userId === chat.userId ? { ...c, unreadByAdmin: 0 } : c));
+                      }}
+                      className={`w-full text-left p-4 border-b border-gray-100 hover:bg-gray-100 transition-colors ${activeChatId === chat.userId ? 'bg-white border-l-4 border-l-olive' : ''}`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <p className="font-bold text-gray-900 text-sm truncate">{chat.userName}</p>
+                        {chat.unreadByAdmin > 0 && (
+                          <span className="bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
+                            {chat.unreadByAdmin}
+                          </span>
+                        )}
+                      </div>
+                      {chat.messages.length > 0 && (
+                        <p className="text-xs text-gray-500 truncate mt-1">{chat.messages[chat.messages.length - 1].text}</p>
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Chat Window */}
+            <div className="flex-1 flex flex-col bg-white relative">
+              {activeChatId ? (
+                <>
+                  <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center gap-x-3">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <h3 className="font-bold text-gray-900">
+                      {chats.find(c => c.userId === activeChatId)?.userName || 'User'}
+                    </h3>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    {chats.find(c => c.userId === activeChatId)?.messages.map((msg, idx) => (
+                      <div key={idx} className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm ${msg.sender === 'admin' ? 'bg-olive text-white self-end ml-auto rounded-tr-none' : 'bg-gray-100 text-gray-800 self-start mr-auto rounded-tl-none'}`}>
+                        <p>{msg.text}</p>
+                        <span className={`text-[10px] block mt-1 ${msg.sender === 'admin' ? 'text-olive-100' : 'text-gray-400'}`}>
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    ))}
+                    <div ref={chatMessagesEndRef} />
+                  </div>
+                  <form onSubmit={handleSendReply} className="p-4 border-t border-gray-100 flex gap-x-2 bg-gray-50">
+                    <input 
+                      type="text" 
+                      value={chatInput} 
+                      onChange={e => setChatInput(e.target.value)}
+                      placeholder="Type your reply..." 
+                      className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-olive"
+                    />
+                    <button type="submit" disabled={!chatInput.trim()} className="bg-olive text-white px-6 py-2 rounded-xl font-bold disabled:opacity-50 hover:bg-gray-900 transition-colors">
+                      Send
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-gray-400">
+                  <p>Select a chat to start messaging</p>
+                </div>
+              )}
             </div>
           </div>
         )}
