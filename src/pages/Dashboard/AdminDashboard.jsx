@@ -16,6 +16,7 @@ const AdminDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [products, setProducts] = useState([]);
   const [promos, setPromos] = useState([]);
+  const [chats, setChats] = useState([]);
   const [offers, setOffers] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [chatInput, setChatInput] = useState('');
