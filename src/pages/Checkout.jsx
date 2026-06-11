@@ -14,6 +14,8 @@ const Checkout = () => {
   const { cartItems, totalPrice, clearCart } = useCart();
   const { showToast } = useToast();
 
+  const navigate = useNavigate();
+
   // Direct buy now থেকে আসলে single product, cart থেকে আসলে cartItems
   const directProduct = location.state?.product;
   const directQty = location.state?.qty || 1;
@@ -22,6 +24,13 @@ const Checkout = () => {
   const checkoutItems = directProduct
     ? [{ ...directProduct, qty: directQty, quantity: directQty, size: directSize }]
     : cartItems.map(i => ({ ...i, qty: i.qty || 1, quantity: i.qty || 1, size: 'M' }));
+
+  React.useEffect(() => {
+    if (checkoutItems.length === 0 && step === 1) {
+      showToast('Your cart is empty!', 'error');
+      navigate('/shop');
+    }
+  }, [checkoutItems.length, navigate, showToast, step]);
 
   const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const delivery = subtotal >= 1000 ? 0 : 60;

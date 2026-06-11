@@ -3,8 +3,20 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('warmhut_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Save to localStorage whenever cartItems changes
+  React.useEffect(() => {
+    localStorage.setItem('warmhut_cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = useCallback((item) => {
     setCartItems(prev => {
