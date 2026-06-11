@@ -1,44 +1,69 @@
-# WarmHut - Premium E-Commerce Platform
+<div align="center">
+  <img src="./src/assets/logo.png" alt="WarmHut Logo" width="120" />
 
-![WarmHut](https://img.shields.io/badge/Status-Active-brightgreen.svg)
-![React](https://img.shields.io/badge/Frontend-React.js-blue.svg)
-![Node.js](https://img.shields.io/badge/Backend-Node.js-green.svg)
-![MongoDB](https://img.shields.io/badge/Database-MongoDB-success.svg)
+  # WarmHut - Premium Winter Wear
+  
+  **A Modern, Full-Stack E-Commerce Platform for Premium Winter Clothing**
 
-WarmHut is a modern, responsive, and full-stack e-commerce platform designed to sell premium winter clothing in Bangladesh. It features a sleek, professional UI with robust backend management, catering to both customers and administrators.
+  [![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Website-olive?style=for-the-badge&logo=vercel)](https://warmhut.vercel.app/)
+  
+  [![React](https://img.shields.io/badge/Frontend-React%2018-61DAFB?style=flat-square&logo=react&logoColor=black)]()
+  [![Node.js](https://img.shields.io/badge/Backend-Node.js-339933?style=flat-square&logo=node.js&logoColor=white)]()
+  [![MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)]()
+  [![TailwindCSS](https://img.shields.io/badge/Styling-Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)]()
 
-## 🚀 Features
+</div>
 
-### Customer Experience
-* **Modern & Responsive UI:** Fully responsive design that works seamlessly on desktop, tablet, and mobile. Built with Tailwind CSS using a mobile-first approach.
-* **Dynamic Homepage:** Sections automatically update based on the latest inventory added via the admin dashboard.
-* **Authentication:** Secure login and registration powered by Better Auth, including Google OAuth integration.
-* **Shopping Cart & Wishlist:** Persistent cart and wishlist management.
-* **Seamless Checkout:** Simple checkout process with Cash on Delivery (COD) and mobile banking options.
-* **User Dashboard:** Customers can view their order history, order statuses, and download invoice PDFs.
-* **Newsletter Subscription:** Integrated newsletter sign-up to receive updates and exclusive offers.
+---
 
-### Admin Capabilities
-* **Role-Based Access Control:** Secure admin routes protected by authentication middlewares.
-* **Dashboard:** A comprehensive, mobile-responsive admin dashboard to oversee store operations.
-* **Product Management:** Full CRUD operations (Create, Read, Update, Delete) for inventory, complete with image uploads and description editing.
-* **Order Management:** View, track, and update the status of customer orders in real-time.
-* **Promo Code Management:** Generate and manage discount codes with expiry dates and usage limits.
-* **Customer Messages:** Read and manage queries submitted through the Contact Us page.
+## 📖 Overview
 
-## 🛠️ Tech Stack
+WarmHut is a high-performance, responsive e-commerce application tailored specifically for the premium winter wear market in Bangladesh. It boasts a sleek, premium UI inspired by modern design trends, offering a seamless shopping experience for customers and a robust management system for administrators.
 
-**Frontend:**
-* React (Vite)
-* Tailwind CSS (Utility-first styling, responsive design)
-* React Router DOM (Routing)
-* AOS (Animate on Scroll)
-* jsPDF (Invoice generation)
+## 🚀 Live Preview
 
-**Backend:**
-* Node.js & Express.js
-* MongoDB & Mongoose (Database)
-* Better Auth (Authentication & Session Management)
-* Nodemailer (Email notifications)
-* Multer (File & Image uploads)
+Check out the live project here: **[https://warmhut.vercel.app/](https://warmhut.vercel.app/)**
 
+---
+
+## ✨ Key Features
+
+### 🛍️ Customer Experience
+- **Premium UI/UX:** A stunning, mobile-first design with smooth animations (AOS), glassmorphism effects, and a highly responsive grid system.
+- **Dynamic Product Discovery:** Sticky dynamic category navigation, intelligent search, and real-time filtering.
+- **Authentication:** Secure Email & Password login, plus **Google OAuth** integration powered by Better Auth.
+- **User Dashboard:** Dedicated portal for users to manage profiles, track order history, and download PDF invoices.
+- **Shopping Cart & Wishlist:** Persistent state management for a frictionless checkout journey.
+
+### 🛡️ Admin Capabilities
+- **Secure Admin Panel:** Role-based access control protecting the dashboard.
+- **Inventory Management:** Full CRUD operations for products and dynamic categories.
+- **Order Tracking:** Real-time visibility into customer orders, statuses, and fulfillment.
+- **Media Management:** Automatic image uploads and optimizations using Cloudinary.
+
+---
+
+## 🛠️ Technology Stack
+
+### Frontend (Client)
+- **Framework:** React.js (Vite)
+- **Styling:** Tailwind CSS + Vanilla CSS (Custom Scrollbars, Animations)
+- **Routing:** React Router DOM v6
+- **State Management:** React Context API
+- **Icons & UI:** React Icons, AOS (Animate On Scroll)
+- **Utilities:** jsPDF (Invoice Generation)
+
+### Backend (Server)
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** MongoDB with Mongoose ODM
+- **Authentication:** Better-Auth (Next-Gen Auth Library)
+- **Storage:** Cloudinary (via Multer)
+
+---
+
+
+
+<div align="center">
+  <p>Built with ❤️ for WarmHut. Elevating the Winter Fashion standard.</p>
+</div>
