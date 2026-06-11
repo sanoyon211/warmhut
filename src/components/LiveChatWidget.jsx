@@ -43,7 +43,14 @@ const LiveChatWidget = () => {
         console.error('Error fetching chat:', error);
       }
     };
+
     fetchChat();
+
+    // Vercel Serverless Fallback: Poll every 3 seconds while open
+    let interval;
+    if (isOpen) {
+      interval = setInterval(fetchChat, 3000);
+    }
 
     socket.emit('joinChat', userId);
 

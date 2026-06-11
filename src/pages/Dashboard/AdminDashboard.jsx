@@ -153,6 +153,20 @@ const AdminDashboard = () => {
     }
   }, [chats, activeChatId]);
 
+  // Vercel Serverless Fallback: Poll every 3 seconds while on Live Support tab
+  useEffect(() => {
+    let interval;
+    if (activeTab === 'live_chat') {
+      interval = setInterval(async () => {
+        try {
+          const chatsData = await getChatsAdmin();
+          setChats(chatsData);
+        } catch (e) {}
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [activeTab]);
+
   const handleCreatePromo = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
