@@ -3,7 +3,8 @@ import { FiMessageCircle, FiX, FiSend } from 'react-icons/fi';
 import { socket } from '../lib/socket';
 import { useSession } from '../lib/auth-client';
 
-const API_BASE = '/api';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const API_BASE = `${BACKEND_URL}/api`;
 
 const LiveChatWidget = () => {
   const { data: session } = useSession();
