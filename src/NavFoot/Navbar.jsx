@@ -71,12 +71,19 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  const navLinks = [
+  const mainNavLinks = [
     { to: '/shop', label: 'Shop All' },
-    ...categories.map(c => ({
-      to: `/shop?category=${encodeURIComponent(c)}`,
-      label: c
-    })),
+    { to: '/offers', label: '🔥 Offers', special: true },
+  ];
+
+  const categoryLinks = categories.map(c => ({
+    to: `/shop?category=${encodeURIComponent(c)}`,
+    label: c
+  }));
+
+  const mobileNavLinks = [
+    { to: '/shop', label: 'Shop All' },
+    ...categoryLinks,
     { to: '/offers', label: '🔥 Offers', special: true },
   ];
 
@@ -152,8 +159,8 @@ const Navbar = () => {
 
           {/* Desktop nav links + actions */}
           <div className="hidden lg:flex items-center gap-x-1">
-            {/* Category links inline */}
-            {navLinks.map(link => (
+            {/* Main Links inline */}
+            {mainNavLinks.map(link => (
               <Link key={link.to} to={link.to}>
                 <span
                   className={`relative px-3 py-1.5 rounded-lg text-[12px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer overflow-hidden group
@@ -307,6 +314,25 @@ const Navbar = () => {
             />
           </div>
         </div>
+        
+        {/* Secondary Category Bar (Desktop Only) */}
+        {categoryLinks.length > 0 && (
+          <div className="hidden lg:block border-t border-gray-100 bg-white/60">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+              <div className="flex items-center justify-center gap-x-8 py-2.5 overflow-x-auto no-scrollbar">
+                {categoryLinks.map(link => (
+                  <Link key={link.to} to={link.to} className="flex-shrink-0">
+                    <span
+                      className={`text-[13px] font-bold tracking-wide transition-colors duration-200 hover:text-olive ${isActive(link.to) ? 'text-olive' : 'text-gray-700'}`}
+                    >
+                      {link.label}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ── Mobile Sidebar Menu ── */}
@@ -352,7 +378,7 @@ const Navbar = () => {
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] px-3 pb-3">
                 Collections
               </p>
-              {navLinks.map(link => (
+              {mobileNavLinks.map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
