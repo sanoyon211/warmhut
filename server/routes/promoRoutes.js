@@ -74,6 +74,10 @@ router.post('/', requireAdmin, async (req, res) => {
       isActive: isActive !== undefined ? isActive : true
     });
     await newPromo.save();
+
+    const io = req.app.get('io');
+    if (io) io.emit('promoCreated', newPromo);
+
     res.status(201).json(newPromo);
   } catch (error) {
     if (error.code === 11000) return res.status(400).json({ message: 'Promo code already exists' });
@@ -89,6 +93,10 @@ router.delete('/:id', requireAdmin, async (req, res) => {
   try {
     const promo = await PromoCode.findByIdAndDelete(req.params.id);
     if (!promo) return res.status(404).json({ message: 'Promo not found' });
+
+    const io = req.app.get('io');
+    if (io) io.emit('promoDeleted', req.params.id);
+
     res.json({ message: 'Promo deleted' });
   } catch (error) {
     console.error('Error deleting promo:', error);

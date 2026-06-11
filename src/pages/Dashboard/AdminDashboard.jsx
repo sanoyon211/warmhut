@@ -4,6 +4,7 @@ import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createPro
 import { useNavigate, Link } from 'react-router';
 import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
+import { socket } from '../../lib/socket';
 
 const AdminDashboard = () => {
   const { data: session } = useSession();
@@ -43,6 +44,53 @@ const AdminDashboard = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    socket.on('newOrder', (newOrder) => {
+      setOrders((prev) => [newOrder, ...prev]);
+      showToast('🔔 New order received!', 'info');
+    });
+
+    socket.on('orderStatusUpdated', (updatedOrder) => {
+      setOrders((prev) => prev.map(o => o._id === updatedOrder._id ? updatedOrder : o));
+    });
+
+    socket.on('newMessage', (msg) => {
+      setMessages((prev) => [msg, ...prev]);
+      showToast('✉️ New customer message received!', 'info');
+    });
+
+    socket.on('productCreated', (product) => {
+      setProducts((prev) => [product, ...prev]);
+    });
+
+    socket.on('productUpdated', (updatedProduct) => {
+      setProducts((prev) => prev.map(p => p._id === updatedProduct._id ? updatedProduct : p));
+    });
+
+    socket.on('productDeleted', (productId) => {
+      setProducts((prev) => prev.filter(p => p._id !== productId));
+    });
+
+    socket.on('promoCreated', (promo) => {
+      setPromos((prev) => [promo, ...prev]);
+    });
+
+    socket.on('promoDeleted', (promoId) => {
+      setPromos((prev) => prev.filter(p => p._id !== promoId));
+    });
+
+    return () => {
+      socket.off('newOrder');
+      socket.off('orderStatusUpdated');
+      socket.off('newMessage');
+      socket.off('productCreated');
+      socket.off('productUpdated');
+      socket.off('productDeleted');
+      socket.off('promoCreated');
+      socket.off('promoDeleted');
+    };
+  }, [showToast]);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {

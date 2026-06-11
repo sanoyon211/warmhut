@@ -63,15 +63,24 @@ router.post('/', async (req, res) => {
 
     const savedOrder = await newOrder.save();
     
-    // Reduce stock
+    // Reduce stock and emit live updates
+    const io = req.app.get('io');
     for (const item of items) {
-      await Product.findByIdAndUpdate(item.id || item.productId, {
+      const updatedProduct = await Product.findByIdAndUpdate(item.id || item.productId, {
         $inc: { stock: -item.qty }
-      });
+      }, { new: true });
+      if (io && updatedProduct) {
+        io.emit('stockUpdated', { productId: updatedProduct._id, stock: updatedProduct.stock });
+      }
     }
 
     // Send email asynchronously (don't block the response)
     sendOrderConfirmationEmail(savedOrder);
+    
+    // Broadcast new order via Socket.io
+    if (io) {
+      io.emit('newOrder', savedOrder);
+    }
     
     res.status(201).json({
       success: true,
@@ -135,6 +144,12 @@ router.patch('/:id/status', requireAdmin, async (req, res) => {
     // Send status update email if status is shipped or delivered
     if (status === 'Shipped' || status === 'Delivered') {
       sendOrderStatusEmail(order);
+    }
+
+    // Broadcast status update via Socket.io
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('orderStatusUpdated', order);
     }
 
     res.json(order);

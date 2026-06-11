@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useSession } from '../lib/auth-client';
 import { getProductById, addReview, fetchRelatedProducts } from '../lib/api';
+import { socket } from '../lib/socket';
 import ProductGrid from '../components/ProductGrid';
 import { AiFillHeart } from 'react-icons/ai';
 import { FiHeart, FiShoppingCart, FiArrowLeft, FiShare2, FiCheck, FiUser } from 'react-icons/fi';
@@ -28,6 +29,7 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState('details');
   const [zoomed, setZoomed] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [viewersCount, setViewersCount] = useState(1);
 
   // Review states
   const [reviewRating, setReviewRating] = useState(5);
@@ -51,6 +53,36 @@ const ProductDetail = () => {
       });
     }
   }, [initialProduct]);
+
+  useEffect(() => {
+    if (!product?.id) return;
+
+    socket.emit('joinProductRoom', product.id);
+
+    const handleViewersCount = (count) => setViewersCount(count);
+    const handleStockUpdate = (data) => {
+      if (data.productId === product.id) {
+        setProduct(prev => ({ ...prev, stock: data.stock }));
+      }
+    };
+    const handleProductUpdate = (updatedProduct) => {
+      if (updatedProduct._id === product.id) {
+        updatedProduct.id = updatedProduct._id;
+        setProduct(updatedProduct);
+      }
+    };
+
+    socket.on('viewersCount', handleViewersCount);
+    socket.on('stockUpdated', handleStockUpdate);
+    socket.on('productUpdated', handleProductUpdate);
+
+    return () => {
+      socket.emit('leaveProductRoom', product.id);
+      socket.off('viewersCount', handleViewersCount);
+      socket.off('stockUpdated', handleStockUpdate);
+      socket.off('productUpdated', handleProductUpdate);
+    };
+  }, [product?.id]);
 
   // Product না থাকলে homepage এ redirect
   if (!product) {
@@ -207,6 +239,12 @@ const ProductDetail = () => {
                 {product.name}
               </h1>
 
+              {viewersCount > 1 && (
+                <div className="inline-flex items-center gap-x-2 bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full mb-3 animate-pulse">
+                  👀 {viewersCount} people are viewing this right now!
+                </div>
+              )}
+
               {/* Rating */}
               <div className="flex items-center gap-x-2 mb-4">
                 <div className="flex items-center gap-x-0.5">
@@ -264,7 +302,14 @@ const ProductDetail = () => {
 
             {/* Quantity */}
             <div>
-              <p className="text-sm font-bold text-gray-800 mb-2">Quantity</p>
+              <p className="text-sm font-bold text-gray-800 mb-2 flex items-center justify-between">
+                Quantity
+                {product.stock !== undefined && (
+                  <span className={`text-xs ${product.stock > 5 ? 'text-green-500' : 'text-red-500'} font-bold`}>
+                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
+                  </span>
+                )}
+              </p>
               <div className="flex items-center gap-x-3">
                 <div className="flex items-center gap-x-0 border-2 border-gray-200 rounded-xl overflow-hidden">
                   <button
@@ -291,13 +336,15 @@ const ProductDetail = () => {
             <div className="flex flex-col gap-y-3">
               <button
                 onClick={handleBuyNow}
-                className="w-full py-4 bg-gray-900 text-white font-black rounded-2xl hover:bg-gray-800 transition-colors text-sm shadow-lg"
+                disabled={product.stock === 0}
+                className="w-full py-4 bg-gray-900 text-white font-black rounded-2xl hover:bg-gray-800 transition-colors text-sm shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                ⚡ Buy Now
+                {product.stock === 0 ? 'Out of Stock' : '⚡ Buy Now'}
               </button>
               <button
                 onClick={handleAddToCart}
-                className={`w-full py-4 font-black rounded-2xl border-2 transition-all text-sm flex items-center justify-center gap-x-2
+                disabled={product.stock === 0}
+                className={`w-full py-4 font-black rounded-2xl border-2 transition-all text-sm flex items-center justify-center gap-x-2 disabled:opacity-50 disabled:cursor-not-allowed
                   ${addedToCart
                     ? 'border-green-500 bg-green-50 text-green-600'
                     : 'border-olive text-olive hover:bg-olive hover:text-white'

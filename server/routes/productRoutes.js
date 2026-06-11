@@ -143,6 +143,10 @@ router.post('/', requireAdmin, async (req, res) => {
     });
 
     const savedProduct = await newProduct.save();
+    
+    const io = req.app.get('io');
+    if (io) io.emit('productCreated', savedProduct);
+
     res.status(201).json(savedProduct);
   } catch (error) {
     console.error('Error creating product:', error);
@@ -193,6 +197,10 @@ router.put('/:id', requireAdmin, async (req, res) => {
       { new: true }
     );
     if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
+
+    const io = req.app.get('io');
+    if (io) io.emit('productUpdated', updatedProduct);
+
     res.json(updatedProduct);
   } catch (error) {
     console.error('Error updating product:', error);
@@ -207,6 +215,10 @@ router.delete('/:id', requireAdmin, async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    const io = req.app.get('io');
+    if (io) io.emit('productDeleted', req.params.id);
+
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     console.error('Error deleting product:', error);

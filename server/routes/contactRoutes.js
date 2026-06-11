@@ -22,6 +22,9 @@ router.post('/', async (req, res) => {
     // Send email to admin asynchronously
     sendContactNotificationEmail(newContact);
 
+    const io = req.app.get('io');
+    if (io) io.emit('newMessage', newContact);
+
     res.status(201).json({ message: 'Message sent successfully!' });
   } catch (error) {
     console.error('Error submitting contact form:', error);

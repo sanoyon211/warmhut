@@ -7,6 +7,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useToast } from '../../context/ToastContext';
 import { authClient } from '../../lib/auth-client';
+import { socket } from '../../lib/socket';
 
 const UserDashboard = () => {
   const { data: session } = useSession();
@@ -43,6 +44,16 @@ const UserDashboard = () => {
       fetchOrders();
     }
   }, [session]);
+
+  useEffect(() => {
+    socket.on('orderStatusUpdated', (updatedOrder) => {
+      setOrders((prev) => prev.map(o => o._id === updatedOrder._id ? updatedOrder : o));
+    });
+
+    return () => {
+      socket.off('orderStatusUpdated');
+    };
+  }, []);
 
   const handleLogout = async () => {
     await signOut();

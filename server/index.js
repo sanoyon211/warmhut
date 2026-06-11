@@ -1,4 +1,6 @@
 import express from "express";
+import http from "http";
+import { Server } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -45,6 +47,46 @@ app.use(cors({
     },
     credentials: true, // Necessary for cookies (session)
 }));
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        credentials: true
+    }
+});
+
+// Make io accessible in routes
+app.set('io', io);
+
+io.on('connection', (socket) => {
+    console.log('A client connected:', socket.id);
+    let currentRoom = null;
+
+    socket.on('joinProductRoom', (productId) => {
+        if (currentRoom) {
+            socket.leave(currentRoom);
+            io.to(currentRoom).emit('viewersCount', io.sockets.adapter.rooms.get(currentRoom)?.size || 0);
+        }
+        currentRoom = productId;
+        socket.join(productId);
+        io.to(productId).emit('viewersCount', io.sockets.adapter.rooms.get(productId)?.size || 0);
+    });
+
+    socket.on('leaveProductRoom', (productId) => {
+        socket.leave(productId);
+        if (currentRoom === productId) currentRoom = null;
+        io.to(productId).emit('viewersCount', io.sockets.adapter.rooms.get(productId)?.size || 0);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+        if (currentRoom) {
+            const count = Math.max(0, (io.sockets.adapter.rooms.get(currentRoom)?.size || 1) - 1);
+            io.to(currentRoom).emit('viewersCount', count);
+        }
+    });
+});
 
 app.use(express.json());
 
@@ -103,7 +145,7 @@ app.get("/", (req, res) => {
 });
 
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(port, () => {
+    server.listen(port, () => {
         console.log(`Server is running on port ${port}`);
     });
 }
