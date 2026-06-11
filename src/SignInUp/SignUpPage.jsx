@@ -54,7 +54,7 @@ const SignUpPage = () => {
     try {
       const { data, error } = await signIn.social({
         provider: 'google',
-        callbackURL: window.location.origin + (redirectUrl || '/dashboard'),
+        callbackURL: window.location.origin + (redirectUrl || '/'),
       });
       if (error) {
         setError(error.message || 'Google sign up failed');

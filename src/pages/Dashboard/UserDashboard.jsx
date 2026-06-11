@@ -4,7 +4,7 @@ import { getUserOrders } from '../../lib/api';
 import { useNavigate } from 'react-router';
 import { FiUser, FiLogOut, FiPackage, FiShoppingBag, FiDownload, FiSettings, FiEdit2 } from 'react-icons/fi';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { useToast } from '../../context/ToastContext';
 import { authClient } from '../../lib/auth-client';
 
@@ -112,7 +112,7 @@ const UserDashboard = () => {
       tableRows.push(itemData);
     });
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 75,
       head: [tableColumn],
       body: tableRows,

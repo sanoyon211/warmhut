@@ -9,22 +9,15 @@ import { useWishlist } from '../context/WishlistContext';
 import { useSession } from '../lib/auth-client';
 import Logo from '../assets/logo.png';
 
-const navLinks = [
-  { to: '/shop', label: 'Shop All' },
-  { to: '/caps', label: 'Caps' },
-  { to: '/dropshoulderhoodie', label: 'Dropshoulder' },
-  { to: '/hoodie', label: 'Hoodie' },
-  { to: '/sweatshirt', label: 'Sweatshirt' },
-  { to: '/shoes', label: 'Shoes' },
-  { to: '/offers', label: '🔥 Offers', special: true },
-];
+import { fetchCategories } from '../lib/api';
 
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [openSearch, setOpenSearch] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { totalItems, setIsCartOpen, isCartOpen } = useCart(); // isCartOpen add kora hoyeche highlight er jonno
+  const [categories, setCategories] = useState([]);
+  const { totalItems, setIsCartOpen, isCartOpen } = useCart();
   const { totalWishlist } = useWishlist();
   const { data: session } = useSession();
   const menuRef = useRef(null);
@@ -46,6 +39,14 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    const loadCategories = async () => {
+      const cats = await fetchCategories();
+      setCategories(cats);
+    };
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = e => {
       if (menuRef.current && !menuRef.current.contains(e.target))
         setOpenMenu(false);
@@ -60,7 +61,24 @@ const Navbar = () => {
     setOpenSearch(false);
   }, [location.pathname]);
 
-  const isActive = path => location.pathname === path;
+  const isActive = (path) => {
+    if (path.includes('?')) {
+      return location.pathname + location.search === path;
+    }
+    if (path === '/shop') {
+      return location.pathname === '/shop' && !location.search;
+    }
+    return location.pathname === path;
+  };
+
+  const navLinks = [
+    { to: '/shop', label: 'Shop All' },
+    ...categories.map(c => ({
+      to: `/shop?category=${encodeURIComponent(c)}`,
+      label: c
+    })),
+    { to: '/offers', label: '🔥 Offers', special: true },
+  ];
 
   return (
     <>

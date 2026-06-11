@@ -33,7 +33,7 @@ const Login = () => {
       } else if (data?.user?.role === 'admin') {
         navigate('/admin');
       } else {
-        navigate('/dashboard');
+        navigate('/');
       }
     }
   };
@@ -42,7 +42,7 @@ const Login = () => {
     try {
       const { data, error } = await signIn.social({
         provider: 'google',
-        callbackURL: window.location.origin + (redirectUrl || '/dashboard'),
+        callbackURL: window.location.origin + (redirectUrl || '/'),
       });
       if (error) {
         setError(error.message || 'Google sign in failed');

@@ -68,7 +68,7 @@ const ProductPageLayout = ({ title, filters, activeFilter, onFilterChange, child
           className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[99] p-6 transition-transform duration-300 ${openFilter ? 'translate-y-0' : 'translate-y-full'}`}
         >
           <div className="flex justify-between items-center mb-5">
-            <h3 className="font-bold text-gray-900">Filter by Color</h3>
+            <h3 className="font-bold text-gray-900">Filter by Category</h3>
             <button onClick={() => setOpenFilter(false)}>
               <MdClose className="w-5 h-5 text-gray-500" />
             </button>

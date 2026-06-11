@@ -22,6 +22,17 @@ export const fetchProducts = async (params = {}) => {
   }
 };
 
+export const fetchCategories = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/products/categories`);
+    if (!response.ok) throw new Error('Failed to fetch categories');
+    return await response.json();
+  } catch (error) {
+    console.error('API Error:', error);
+    return [];
+  }
+};
+
 export const searchProducts = async (query) => {
   try {
     const response = await fetch(`${API_BASE}/products/search?q=${encodeURIComponent(query)}`);
