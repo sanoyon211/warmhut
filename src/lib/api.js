@@ -3,6 +3,13 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 const API_BASE = `${BACKEND_URL}/api`;
 
+const fetchWithAuth = (url, options = {}) => {
+  return fetch(url, {
+    ...options,
+    credentials: 'include' // Crucial for cross-origin authentication
+  });
+};
+
 export const fetchProducts = async (params = {}) => {
   try {
     const query = new URLSearchParams();
@@ -14,7 +21,7 @@ export const fetchProducts = async (params = {}) => {
     if (params.page) query.append('page', params.page);
     if (params.limit) query.append('limit', params.limit);
 
-    const response = await fetch(`${API_BASE}/products?${query.toString()}`);
+    const response = await fetchWithAuth(`${API_BASE}/products?${query.toString()}`);
     if (!response.ok) throw new Error('Failed to fetch products');
     return await response.json();
   } catch (error) {
@@ -25,7 +32,7 @@ export const fetchProducts = async (params = {}) => {
 
 export const fetchCategories = async () => {
   try {
-    const response = await fetch(`${API_BASE}/products/categories`);
+    const response = await fetchWithAuth(`${API_BASE}/products/categories`);
     if (!response.ok) throw new Error('Failed to fetch categories');
     return await response.json();
   } catch (error) {
@@ -36,7 +43,7 @@ export const fetchCategories = async () => {
 
 export const searchProducts = async (query) => {
   try {
-    const response = await fetch(`${API_BASE}/products/search?q=${encodeURIComponent(query)}`);
+    const response = await fetchWithAuth(`${API_BASE}/products/search?q=${encodeURIComponent(query)}`);
     if (!response.ok) throw new Error('Failed to search products');
     return await response.json();
   } catch (error) {
@@ -47,7 +54,7 @@ export const searchProducts = async (query) => {
 
 export const createOrder = async (orderData) => {
   try {
-    const response = await fetch(`${API_BASE}/orders`, {
+    const response = await fetchWithAuth(`${API_BASE}/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -68,7 +75,7 @@ export const createOrder = async (orderData) => {
 
 export const getUserOrders = async (userId) => {
   try {
-    const response = await fetch(`${API_BASE}/orders/user/${userId}`);
+    const response = await fetchWithAuth(`${API_BASE}/orders/user/${userId}`);
     if (!response.ok) throw new Error('Failed to fetch user orders');
     return await response.json();
   } catch (error) {
@@ -79,7 +86,7 @@ export const getUserOrders = async (userId) => {
 
 export const getAllOrders = async () => {
   try {
-    const response = await fetch(`${API_BASE}/orders`);
+    const response = await fetchWithAuth(`${API_BASE}/orders`);
     if (!response.ok) throw new Error('Failed to fetch all orders');
     return await response.json();
   } catch (error) {
@@ -90,7 +97,7 @@ export const getAllOrders = async () => {
 
 export const getWishlist = async (userId) => {
   try {
-    const response = await fetch(`${API_BASE}/wishlist/${userId}`);
+    const response = await fetchWithAuth(`${API_BASE}/wishlist/${userId}`);
     if (!response.ok) throw new Error('Failed to fetch wishlist');
     return await response.json();
   } catch (error) {
@@ -101,7 +108,7 @@ export const getWishlist = async (userId) => {
 
 export const toggleWishlistApi = async (userId, productId) => {
   try {
-    const response = await fetch(`${API_BASE}/wishlist/toggle`, {
+    const response = await fetchWithAuth(`${API_BASE}/wishlist/toggle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, productId })
@@ -116,7 +123,7 @@ export const toggleWishlistApi = async (userId, productId) => {
 
 export const addReview = async (productId, reviewData) => {
   try {
-    const response = await fetch(`${API_BASE}/products/${productId}/reviews`, {
+    const response = await fetchWithAuth(`${API_BASE}/products/${productId}/reviews`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reviewData)
@@ -132,7 +139,7 @@ export const addReview = async (productId, reviewData) => {
 
 export const getProductById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE}/products/${id}`);
+    const response = await fetchWithAuth(`${API_BASE}/products/${id}`);
     if (!response.ok) throw new Error('Product not found');
     return await response.json();
   } catch (error) {
@@ -143,7 +150,7 @@ export const getProductById = async (id) => {
 
 export const fetchRelatedProducts = async (id) => {
   try {
-    const response = await fetch(`${API_BASE}/products/related/${id}`);
+    const response = await fetchWithAuth(`${API_BASE}/products/related/${id}`);
     if (!response.ok) throw new Error('Failed to fetch related products');
     return await response.json();
   } catch (error) {
@@ -154,7 +161,7 @@ export const fetchRelatedProducts = async (id) => {
 
 export const validatePromo = async (code) => {
   try {
-    const response = await fetch(`${API_BASE}/promo/validate`, {
+    const response = await fetchWithAuth(`${API_BASE}/promo/validate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code })
@@ -169,7 +176,7 @@ export const validatePromo = async (code) => {
 
 export const submitContact = async (contactData) => {
   try {
-    const response = await fetch(`${API_BASE}/contact`, {
+    const response = await fetchWithAuth(`${API_BASE}/contact`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contactData)
@@ -184,7 +191,7 @@ export const submitContact = async (contactData) => {
 
 export const getAllContacts = async () => {
   try {
-    const response = await fetch(`${API_BASE}/contact`);
+    const response = await fetchWithAuth(`${API_BASE}/contact`);
     if (!response.ok) throw new Error('Failed to fetch contacts');
     return await response.json();
   } catch (error) {
@@ -195,7 +202,7 @@ export const getAllContacts = async () => {
 
 export const markContactRead = async (id) => {
   try {
-    const response = await fetch(`${API_BASE}/contact/${id}/read`, {
+    const response = await fetchWithAuth(`${API_BASE}/contact/${id}/read`, {
       method: 'PATCH'
     });
     if (!response.ok) throw new Error('Failed to mark as read');
@@ -208,7 +215,7 @@ export const markContactRead = async (id) => {
 
 export const createProduct = async (productData) => {
   try {
-    const response = await fetch(`${API_BASE}/products`, {
+    const response = await fetchWithAuth(`${API_BASE}/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productData)
@@ -222,7 +229,7 @@ export const createProduct = async (productData) => {
 
 export const updateProduct = async (id, productData) => {
   try {
-    const response = await fetch(`${API_BASE}/products/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE}/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productData)
@@ -236,7 +243,7 @@ export const updateProduct = async (id, productData) => {
 
 export const deleteProduct = async (id) => {
   try {
-    const response = await fetch(`${API_BASE}/products/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE}/products/${id}`, {
       method: 'DELETE'
     });
     if (!response.ok) throw new Error('Failed to delete product');
@@ -248,7 +255,7 @@ export const deleteProduct = async (id) => {
 
 export const updateOrderStatus = async (id, status) => {
   try {
-    const response = await fetch(`${API_BASE}/orders/${id}/status`, {
+    const response = await fetchWithAuth(`${API_BASE}/orders/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
@@ -262,7 +269,7 @@ export const updateOrderStatus = async (id, status) => {
 
 export const getPromos = async () => {
   try {
-    const response = await fetch(`${API_BASE}/promo`);
+    const response = await fetchWithAuth(`${API_BASE}/promo`);
     if (!response.ok) throw new Error('Failed to fetch promos');
     return await response.json();
   } catch (error) {
@@ -272,7 +279,7 @@ export const getPromos = async () => {
 
 export const createPromo = async (promoData) => {
   try {
-    const response = await fetch(`${API_BASE}/promo`, {
+    const response = await fetchWithAuth(`${API_BASE}/promo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(promoData)
@@ -287,7 +294,7 @@ export const createPromo = async (promoData) => {
 
 export const deletePromo = async (id) => {
   try {
-    const response = await fetch(`${API_BASE}/promo/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE}/promo/${id}`, {
       method: 'DELETE'
     });
     if (!response.ok) throw new Error('Failed to delete promo');
@@ -301,7 +308,7 @@ export const deletePromo = async (id) => {
 export const getChatsAdmin = async () => {
   try {
     // Note: Admin routes require auth credentials depending on setup
-    const response = await fetch(`${API_BASE}/chat/admin`);
+    const response = await fetchWithAuth(`${API_BASE}/chat/admin`);
     if (!response.ok) throw new Error('Failed to fetch chats');
     return await response.json();
   } catch (error) {
@@ -311,7 +318,7 @@ export const getChatsAdmin = async () => {
 
 export const sendChatMessage = async (data) => {
   try {
-    const response = await fetch(`${API_BASE}/chat/message`, {
+    const response = await fetchWithAuth(`${API_BASE}/chat/message`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -328,7 +335,7 @@ export const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await fetchWithAuth(`${API_BASE}/upload`, {
       method: 'POST',
       body: formData // Note: We do NOT set Content-Type header manually here; fetch sets it with boundary for FormData
     });
@@ -343,7 +350,7 @@ export const uploadImage = async (file) => {
 
 export const subscribeNewsletter = async (email) => {
   try {
-    const response = await fetch(`${API_BASE}/newsletter`, {
+    const response = await fetchWithAuth(`${API_BASE}/newsletter`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })

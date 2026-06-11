@@ -34,7 +34,9 @@ const LiveChatWidget = () => {
 
     const fetchChat = async () => {
       try {
-        const response = await fetch(`${API_BASE}/chat/${userId}`);
+        const response = await fetch(`${API_BASE}/chat/${userId}`, {
+          credentials: 'include'
+        });
         const data = await response.json();
         if (data && data.messages) {
           setMessages(data.messages);
@@ -76,7 +78,8 @@ const LiveChatWidget = () => {
       fetch(`${API_BASE}/chat/${userId}/read`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reader: 'user' })
+        body: JSON.stringify({ reader: 'user' }),
+        credentials: 'include'
       }).catch(console.error);
     }
   }, [isOpen, unreadCount, userId]);
@@ -103,7 +106,8 @@ const LiveChatWidget = () => {
           userName: session?.user?.name || 'Guest',
           text,
           sender: 'user'
-        })
+        }),
+        credentials: 'include'
       });
     } catch (error) {
       console.error('Error sending message:', error);
