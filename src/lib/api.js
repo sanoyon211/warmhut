@@ -296,6 +296,32 @@ export const deletePromo = async (id) => {
   }
 };
 
+// ─── Live Chat ───
+export const getChatsAdmin = async () => {
+  try {
+    // Note: Admin routes require auth credentials depending on setup
+    const response = await fetch(`${API_BASE}/chat/admin`);
+    if (!response.ok) throw new Error('Failed to fetch chats');
+    return await response.json();
+  } catch (error) {
+    return [];
+  }
+};
+
+export const sendChatMessage = async (data) => {
+  try {
+    const response = await fetch(`${API_BASE}/chat/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to send message');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const uploadImage = async (file) => {
   try {
     const formData = new FormData();

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FiMessageCircle, FiX, FiSend } from 'react-icons/fi';
 import { socket } from '../lib/socket';
 import { useSession } from '../lib/auth-client';
-import axios from 'axios';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -34,10 +33,11 @@ const LiveChatWidget = () => {
 
     const fetchChat = async () => {
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/chat/${userId}`);
-        if (res.data && res.data.messages) {
-          setMessages(res.data.messages);
-          setUnreadCount(res.data.unreadByUser || 0);
+        const response = await fetch(`${BACKEND_URL}/api/chat/${userId}`);
+        const data = await response.json();
+        if (data && data.messages) {
+          setMessages(data.messages);
+          setUnreadCount(data.unreadByUser || 0);
         }
       } catch (error) {
         console.error('Error fetching chat:', error);
@@ -65,7 +65,11 @@ const LiveChatWidget = () => {
   useEffect(() => {
     if (isOpen && unreadCount > 0 && userId) {
       setUnreadCount(0);
-      axios.patch(`${BACKEND_URL}/api/chat/${userId}/read`, { reader: 'user' }).catch(console.error);
+      fetch(`${BACKEND_URL}/api/chat/${userId}/read`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reader: 'user' })
+      }).catch(console.error);
     }
   }, [isOpen, unreadCount, userId]);
 
@@ -83,11 +87,15 @@ const LiveChatWidget = () => {
     setInputText('');
 
     try {
-      await axios.post(`${BACKEND_URL}/api/chat/message`, {
-        userId,
-        userName: session?.user?.name || 'Guest',
-        text,
-        sender: 'user'
+      await fetch(`${BACKEND_URL}/api/chat/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          userName: session?.user?.name || 'Guest',
+          text,
+          sender: 'user'
+        })
       });
     } catch (error) {
       console.error('Error sending message:', error);
