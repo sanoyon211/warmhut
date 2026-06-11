@@ -108,7 +108,7 @@ const Navbar = () => {
 
         {/* Main row */}
         <div
-          className={`max-w-[1400px] mx-auto px-4 md:px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-14 md:h-16' : 'h-16 md:h-20'}`}
+          className={`max-w-[1400px] mx-auto px-4 md:px-6 flex items-center justify-between transition-all duration-300 overflow-hidden ${scrolled ? 'h-14 lg:h-0 lg:opacity-0' : 'h-16 md:h-20 opacity-100'}`}
         >
           {/* Logo */}
           <Link
