@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
 import { getAllOrders, getAllContacts, markContactRead, deleteContact, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage, getChatsAdmin, sendChatMessage, deleteChatAdmin, getOffers, createOffer, updateOffer, deleteOffer } from '../../lib/api';
 import { useNavigate, Link } from 'react-router';
-import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu, FiStar } from 'react-icons/fi';
+import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu, FiStar, FiSend, FiUser, FiClock } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
 import { socket } from '../../lib/socket';
 
@@ -865,15 +865,22 @@ const AdminDashboard = () => {
 
         {/* Live Chat Tab */}
         {activeTab === 'live_chat' && (
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex h-[600px]">
-            {/* Chat List */}
-            <div className="w-1/3 border-r border-gray-100 flex flex-col bg-gray-50">
-              <div className="p-4 border-b border-gray-200 bg-white">
-                <h3 className="font-black text-gray-900">Active Chats</h3>
+          <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden flex h-[700px] max-h-[85vh]">
+            {/* Chat List Sidebar */}
+            <div className="w-1/3 border-r border-gray-100 flex flex-col bg-gray-50/50 z-10 relative">
+              <div className="p-5 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+                <h3 className="font-black text-gray-900 flex items-center gap-x-2">
+                  <FiMessageSquare className="text-olive" /> Active Conversations
+                </h3>
               </div>
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto p-3 space-y-1">
                 {chats.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-10">No active chats</p>
+                  <div className="text-center py-10 opacity-50">
+                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <FiMessageSquare className="w-6 h-6 text-gray-400" />
+                    </div>
+                    <p className="text-sm font-bold text-gray-500">No active chats</p>
+                  </div>
                 ) : (
                   chats.map(chat => (
                     <button 
@@ -882,7 +889,6 @@ const AdminDashboard = () => {
                         setActiveChatId(chat.userId);
                         if (chat.unreadByAdmin > 0) {
                           setChats(prev => prev.map(c => c.userId === chat.userId ? { ...c, unreadByAdmin: 0 } : c));
-                          // Call backend API to mark as read
                           try {
                             const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
                             await fetch(`${BACKEND_URL}/api/chat/${chat.userId}/read`, {
@@ -896,19 +902,40 @@ const AdminDashboard = () => {
                           }
                         }
                       }}
-                      className={`w-full text-left p-4 border-b border-gray-100 hover:bg-gray-100 transition-colors ${activeChatId === chat.userId ? 'bg-white border-l-4 border-l-olive' : ''}`}
+                      className={`w-full text-left p-3 rounded-2xl transition-all duration-200 flex items-center gap-x-3 ${
+                        activeChatId === chat.userId 
+                          ? 'bg-white shadow-sm ring-1 ring-gray-100' 
+                          : 'hover:bg-gray-100/80 border border-transparent'
+                      }`}
                     >
-                      <div className="flex justify-between items-start">
-                        <p className="font-bold text-gray-900 text-sm truncate">{chat.userName}</p>
+                      <div className="relative">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-black text-sm shadow-sm ${
+                          activeChatId === chat.userId ? 'bg-olive text-white' : 'bg-gray-200 text-gray-600'
+                        }`}>
+                          {chat.userName.charAt(0).toUpperCase()}
+                        </div>
                         {chat.unreadByAdmin > 0 && (
-                          <span className="bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
                             {chat.unreadByAdmin}
                           </span>
                         )}
                       </div>
-                      {chat.messages.length > 0 && (
-                        <p className="text-xs text-gray-500 truncate mt-1">{chat.messages[chat.messages.length - 1].text}</p>
-                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center mb-0.5">
+                          <p className="font-bold text-gray-900 text-sm truncate pr-2">{chat.userName}</p>
+                          {chat.messages.length > 0 && (
+                            <span className="text-[10px] font-bold text-gray-400 whitespace-nowrap">
+                              {new Date(chat.messages[chat.messages.length - 1].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                        </div>
+                        {chat.messages.length > 0 && (
+                          <p className={`text-xs truncate ${chat.unreadByAdmin > 0 ? 'font-bold text-gray-800' : 'text-gray-500'}`}>
+                            {chat.messages[chat.messages.length - 1].sender === 'admin' ? 'You: ' : ''}
+                            {chat.messages[chat.messages.length - 1].text}
+                          </p>
+                        )}
+                      </div>
                     </button>
                   ))
                 )}
@@ -916,50 +943,96 @@ const AdminDashboard = () => {
             </div>
 
             {/* Chat Window */}
-            <div className="flex-1 flex flex-col bg-white relative">
+            <div className="flex-1 flex flex-col bg-slate-50 relative">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E")' }} />
+              
               {activeChatId ? (
                 <>
-                  <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                  {/* Chat Header */}
+                  <div className="p-4 border-b border-gray-100 bg-white/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-20 shadow-sm">
                     <div className="flex items-center gap-x-3">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <h3 className="font-bold text-gray-900">
-                        {chats.find(c => c.userId === activeChatId)?.userName || 'User'}
-                      </h3>
+                      <div className="relative">
+                        <div className="w-10 h-10 bg-olive text-white rounded-full flex items-center justify-center font-black shadow-sm">
+                          {chats.find(c => c.userId === activeChatId)?.userName.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 leading-tight">
+                          {chats.find(c => c.userId === activeChatId)?.userName || 'User'}
+                        </h3>
+                        <p className="text-[10px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-x-1">
+                          Online
+                        </p>
+                      </div>
                     </div>
                     <button 
                       onClick={() => handleDeleteChat(activeChatId)}
-                      className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-x-2 text-sm font-bold"
+                      className="text-red-500 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors flex items-center gap-x-2 text-sm font-bold border border-transparent hover:border-red-100"
                     >
-                      <FiTrash2 className="w-4 h-4" /> Delete Chat
+                      <FiTrash2 className="w-4 h-4" /> Delete
                     </button>
                   </div>
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    {chats.find(c => c.userId === activeChatId)?.messages.map((msg, idx) => (
-                      <div key={idx} className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm ${msg.sender === 'admin' ? 'bg-olive text-white self-end ml-auto rounded-tr-none' : 'bg-gray-100 text-gray-800 self-start mr-auto rounded-tl-none'}`}>
-                        <p>{msg.text}</p>
-                        <span className={`text-[10px] block mt-1 ${msg.sender === 'admin' ? 'text-olive-100' : 'text-gray-400'}`}>
-                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    ))}
-                    <div ref={chatMessagesEndRef} />
+
+                  {/* Messages Area */}
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10 scroll-smooth">
+                    <div className="text-center mb-6">
+                      <span className="bg-white/80 border border-gray-200 text-gray-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-sm shadow-sm">
+                        Conversation Started
+                      </span>
+                    </div>
+                    {chats.find(c => c.userId === activeChatId)?.messages.map((msg, idx) => {
+                      const isAdmin = msg.sender === 'admin';
+                      return (
+                        <div key={idx} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[75%] px-5 py-3 text-sm shadow-sm relative group ${
+                            isAdmin 
+                              ? 'bg-olive text-white rounded-2xl rounded-tr-sm' 
+                              : 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm'
+                          }`}>
+                            <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                            <span className={`text-[9px] font-bold uppercase tracking-wider flex items-center gap-x-1 mt-2 justify-end ${
+                              isAdmin ? 'text-olive-100' : 'text-gray-400'
+                            }`}>
+                              <FiClock className="w-2.5 h-2.5" />
+                              {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={chatMessagesEndRef} className="h-2" />
                   </div>
-                  <form onSubmit={handleSendReply} className="p-4 border-t border-gray-100 flex gap-x-2 bg-gray-50">
-                    <input 
-                      type="text" 
-                      value={chatInput} 
-                      onChange={e => setChatInput(e.target.value)}
-                      placeholder="Type your reply..." 
-                      className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:border-olive"
-                    />
-                    <button type="submit" disabled={!chatInput.trim()} className="bg-olive text-white px-6 py-2 rounded-xl font-bold disabled:opacity-50 hover:bg-gray-900 transition-colors">
-                      Send
-                    </button>
+
+                  {/* Input Area */}
+                  <form onSubmit={handleSendReply} className="p-4 bg-white/90 backdrop-blur-md border-t border-gray-100 relative z-20">
+                    <div className="flex items-center gap-x-2 bg-gray-50 border border-gray-200 p-1.5 rounded-full focus-within:border-olive focus-within:ring-2 focus-within:ring-olive/20 transition-all shadow-inner">
+                      <input 
+                        type="text" 
+                        value={chatInput} 
+                        onChange={e => setChatInput(e.target.value)}
+                        placeholder="Type a message..." 
+                        className="flex-1 bg-transparent px-4 py-2 focus:outline-none text-sm text-gray-800 placeholder-gray-400"
+                        autoComplete="off"
+                      />
+                      <button 
+                        type="submit" 
+                        disabled={!chatInput.trim()} 
+                        className="w-10 h-10 flex-shrink-0 bg-olive text-white rounded-full flex items-center justify-center hover:bg-gray-900 transition-colors shadow-sm disabled:opacity-50 disabled:hover:bg-olive transform active:scale-95"
+                      >
+                        <FiSend className="w-4 h-4 ml-0.5" />
+                      </button>
+                    </div>
                   </form>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-gray-400">
-                  <p>Select a chat to start messaging</p>
+                <div className="flex-1 flex flex-col items-center justify-center text-gray-400 relative z-10 bg-white">
+                  <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100 shadow-sm">
+                    <FiMessageSquare className="w-10 h-10 text-gray-300" />
+                  </div>
+                  <h3 className="font-black text-xl text-gray-900 mb-2">WarmHut Support</h3>
+                  <p className="text-sm">Select a conversation from the left to start messaging.</p>
                 </div>
               )}
             </div>
