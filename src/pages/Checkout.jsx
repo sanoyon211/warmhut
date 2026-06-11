@@ -20,8 +20,8 @@ const Checkout = () => {
   const directSize = location.state?.selectedSize || 'M';
 
   const checkoutItems = directProduct
-    ? [{ ...directProduct, quantity: directQty, size: directSize }]
-    : cartItems.map(i => ({ ...i, quantity: i.qty || 1, size: 'M' }));
+    ? [{ ...directProduct, qty: directQty, quantity: directQty, size: directSize }]
+    : cartItems.map(i => ({ ...i, qty: i.qty || 1, quantity: i.qty || 1, size: 'M' }));
 
   const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const delivery = subtotal >= 1000 ? 0 : 60;
