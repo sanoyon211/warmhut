@@ -104,4 +104,18 @@ router.patch('/:userId/read', async (req, res) => {
   }
 });
 
+// @route   DELETE /api/chat/:userId
+// @desc    Delete a user's chat thread
+// @access  Private/Admin
+router.delete('/:userId', requireAdmin, async (req, res) => {
+  try {
+    const chat = await Chat.findOneAndDelete({ userId: req.params.userId });
+    if (!chat) return res.status(404).json({ message: 'Chat not found' });
+    res.json({ message: 'Chat deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting chat:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 export default router;

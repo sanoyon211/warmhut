@@ -19,6 +19,7 @@ import promoRoutes from "./routes/promoRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import newsletterRoutes from "./routes/newsletterRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import offerRoutes from "./routes/offerRoutes.js";
 
 dotenv.config();
 
@@ -120,6 +121,7 @@ app.use("/api/promo", promoRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/offers", offerRoutes);
 
 // Configure Cloudinary
 cloudinary.config({

@@ -200,6 +200,18 @@ export const getAllContacts = async () => {
   }
 };
 
+export const deleteContact = async (id) => {
+  try {
+    const response = await fetchWithAuth(`${API_BASE}/contact/${id}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete message');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const markContactRead = async (id) => {
   try {
     const response = await fetchWithAuth(`${API_BASE}/contact/${id}/read`, {
@@ -304,6 +316,57 @@ export const deletePromo = async (id) => {
   }
 };
 
+export const getOffers = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/offers`);
+    if (!response.ok) throw new Error('Failed to fetch offers');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching offers:', error);
+    return [];
+  }
+};
+
+export const createOffer = async (offerData) => {
+  try {
+    const response = await fetchWithAuth(`${API_BASE}/offers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(offerData)
+    });
+    if (!response.ok) throw new Error('Failed to create offer');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateOffer = async (id, offerData) => {
+  try {
+    const response = await fetchWithAuth(`${API_BASE}/offers/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(offerData)
+    });
+    if (!response.ok) throw new Error('Failed to update offer');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteOffer = async (id) => {
+  try {
+    const response = await fetchWithAuth(`${API_BASE}/offers/${id}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete offer');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
 // ─── Live Chat ───
 export const getChatsAdmin = async () => {
   try {
@@ -313,6 +376,18 @@ export const getChatsAdmin = async () => {
     return await response.json();
   } catch (error) {
     return [];
+  }
+};
+
+export const deleteChatAdmin = async (userId) => {
+  try {
+    const response = await fetchWithAuth(`${API_BASE}/chat/${userId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete chat');
+    return await response.json();
+  } catch (error) {
+    throw error;
   }
 };
 

@@ -63,4 +63,18 @@ router.patch('/:id/read', requireAdmin, async (req, res) => {
   }
 });
 
+// @route   DELETE /api/contact/:id
+// @desc    Delete a message
+// @access  Private/Admin
+router.delete('/:id', requireAdmin, async (req, res) => {
+  try {
+    const message = await Contact.findByIdAndDelete(req.params.id);
+    if (!message) return res.status(404).json({ message: 'Message not found' });
+    res.json({ message: 'Message deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting message:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 export default router;

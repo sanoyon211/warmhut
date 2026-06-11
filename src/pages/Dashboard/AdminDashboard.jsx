@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
-import { getAllOrders, getAllContacts, markContactRead, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage, getChatsAdmin, sendChatMessage } from '../../lib/api';
+import { getAllOrders, getAllContacts, markContactRead, deleteContact, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage, getChatsAdmin, sendChatMessage, deleteChatAdmin, getOffers, createOffer, updateOffer, deleteOffer } from '../../lib/api';
 import { useNavigate, Link } from 'react-router';
-import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu } from 'react-icons/fi';
+import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu, FiStar } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
 import { socket } from '../../lib/socket';
 
@@ -16,7 +16,7 @@ const AdminDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [products, setProducts] = useState([]);
   const [promos, setPromos] = useState([]);
-  const [chats, setChats] = useState([]);
+  const [offers, setOffers] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [chatInput, setChatInput] = useState('');
   const chatMessagesEndRef = useRef(null);
@@ -24,6 +24,9 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const [showProductModal, setShowProductModal] = useState(false);
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [editingOffer, setEditingOffer] = useState(null);
+  const [offerForm, setOfferForm] = useState({ emoji: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: '', badge: '', badgeColor: '', items: '' });
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({ name: '', price: '', category: '', color: '', image: '', stock: '', description: '' });
   const [imageFile, setImageFile] = useState(null);
@@ -34,18 +37,20 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [ordersData, messagesData, productsData, promosData, chatsData] = await Promise.all([
+      const [ordersData, messagesData, productsData, promosData, chatsData, offersData] = await Promise.all([
         getAllOrders(),
         getAllContacts(),
         fetchProducts({ limit: 1000 }),
         getPromos(),
-        getChatsAdmin().catch(() => [])
+        getChatsAdmin().catch(() => []),
+        getOffers().catch(() => [])
       ]);
       setOrders(ordersData);
       setMessages(messagesData);
       setProducts(productsData.products || []);
       setPromos(promosData);
       setChats(chatsData);
+      setOffers(offersData);
       setLoading(false);
     };
     fetchData();
@@ -204,6 +209,29 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteMessage = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this message?')) return;
+    try {
+      await deleteContact(id);
+      setMessages(messages.filter(m => m._id !== id));
+      showToast('Message deleted!', 'success');
+    } catch (error) {
+      showToast('Failed to delete message', 'error');
+    }
+  };
+
+  const handleDeleteChat = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this entire chat history?')) return;
+    try {
+      await deleteChatAdmin(userId);
+      setChats(chats.filter(c => c.userId !== userId));
+      if (activeChatId === userId) setActiveChatId(null);
+      showToast('Chat history deleted!', 'success');
+    } catch (error) {
+      showToast('Failed to delete chat', 'error');
+    }
+  };
+
   const handleProductSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -272,6 +300,59 @@ const AdminDashboard = () => {
     setShowProductModal(true);
   };
 
+  const handleOfferSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formattedData = {
+        ...offerForm,
+        items: offerForm.items.split(',').map(i => i.trim()),
+        originalPrice: Number(offerForm.originalPrice),
+        salePrice: Number(offerForm.salePrice)
+      };
+
+      if (editingOffer) {
+        const updated = await updateOffer(editingOffer._id, formattedData);
+        setOffers(offers.map(o => o._id === updated._id ? updated : o));
+        showToast('Offer updated!', 'success');
+      } else {
+        const created = await createOffer(formattedData);
+        setOffers([created, ...offers]);
+        showToast('Offer created!', 'success');
+      }
+      setShowOfferModal(false);
+      setOfferForm({ emoji: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: '', badge: '', badgeColor: '', items: '' });
+      setEditingOffer(null);
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  const handleDeleteOffer = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this offer?')) return;
+    try {
+      await deleteOffer(id);
+      setOffers(offers.filter(o => o._id !== id));
+      showToast('Offer deleted!', 'success');
+    } catch (error) {
+      showToast('Failed to delete offer', 'error');
+    }
+  };
+
+  const openOfferEditModal = (offer) => {
+    setEditingOffer(offer);
+    setOfferForm({
+      ...offer,
+      items: offer.items.join(', ')
+    });
+    setShowOfferModal(true);
+  };
+
+  const openOfferAddModal = () => {
+    setEditingOffer(null);
+    setOfferForm({ emoji: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: 'from-blue-500 to-indigo-700', badge: 'HOT', badgeColor: 'bg-red-500', items: '' });
+    setShowOfferModal(true);
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
@@ -330,7 +411,7 @@ const AdminDashboard = () => {
             Products & Inventory
           </button>
 
-          <button
+            <button
             onClick={() => setActiveTab('promos')}
             className={`w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
               activeTab === 'promos' ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
@@ -338,6 +419,16 @@ const AdminDashboard = () => {
           >
             <FiTag className={`w-5 h-5 ${activeTab === 'promos' ? 'text-white' : 'text-gray-500'}`} />
             Promo Codes
+          </button>
+
+          <button
+            onClick={() => setActiveTab('offers')}
+            className={`w-full flex items-center gap-x-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+              activeTab === 'offers' ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+            }`}
+          >
+            <FiStar className={`w-5 h-5 ${activeTab === 'offers' ? 'text-white' : 'text-gray-500'}`} />
+            Website Offers
           </button>
 
           <button
@@ -565,11 +656,17 @@ const AdminDashboard = () => {
                       {msg.status === 'unread' && (
                         <button 
                           onClick={() => handleMarkRead(msg._id)}
-                          className="flex items-center gap-x-1.5 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-200 transition-colors"
+                          className="flex items-center gap-x-1.5 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-200 transition-colors mr-3"
                         >
                           <FiCheck className="w-3 h-3" /> Mark as Read
                         </button>
                       )}
+                      <button 
+                        onClick={() => handleDeleteMessage(msg._id)}
+                        className="flex items-center gap-x-1.5 text-xs font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors inline-flex"
+                      >
+                        <FiTrash2 className="w-3 h-3" /> Delete
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -703,6 +800,68 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Offers Tab */}
+        {activeTab === 'offers' && (
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="font-black text-lg text-gray-900">Manage Website Offers</h2>
+              <button 
+                onClick={openOfferAddModal}
+                className="bg-olive text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-x-2 hover:bg-gray-900 transition-colors"
+              >
+                <FiPlus /> Add Offer
+              </button>
+            </div>
+            
+            {loading ? (
+               <div className="flex justify-center py-20">
+                 <span className="w-8 h-8 border-4 border-olive/30 border-t-olive rounded-full animate-spin"></span>
+               </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm text-gray-600">
+                  <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-500">
+                    <tr>
+                      <th className="px-6 py-4">Offer</th>
+                      <th className="px-6 py-4">Title</th>
+                      <th className="px-6 py-4">Discount</th>
+                      <th className="px-6 py-4">Price</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {offers.map(offer => (
+                      <tr key={offer._id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-4 text-3xl">{offer.emoji}</td>
+                        <td className="px-6 py-4 font-bold text-gray-900">{offer.title}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 text-[10px] font-black rounded-full uppercase text-white ${offer.badgeColor}`}>{offer.badge}</span>
+                          <span className="ml-2 font-bold text-olive">{offer.discount}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-gray-400 line-through text-xs">৳{offer.originalPrice}</p>
+                          <p className="font-black text-gray-900">৳{offer.salePrice}</p>
+                        </td>
+                        <td className="px-6 py-4 flex justify-end gap-x-2">
+                          <button onClick={() => openOfferEditModal(offer)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
+                            <FiEdit2 />
+                          </button>
+                          <button onClick={() => handleDeleteOffer(offer._id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
+                            <FiTrash2 />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {offers.length === 0 && (
+                  <div className="text-center py-10 text-gray-400">No active offers. Create one to display on the website.</div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Live Chat Tab */}
         {activeTab === 'live_chat' && (
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex h-[600px]">
@@ -718,10 +877,23 @@ const AdminDashboard = () => {
                   chats.map(chat => (
                     <button 
                       key={chat.userId}
-                      onClick={() => {
+                      onClick={async () => {
                         setActiveChatId(chat.userId);
-                        // Optional: mark as read logic here
-                        setChats(prev => prev.map(c => c.userId === chat.userId ? { ...c, unreadByAdmin: 0 } : c));
+                        if (chat.unreadByAdmin > 0) {
+                          setChats(prev => prev.map(c => c.userId === chat.userId ? { ...c, unreadByAdmin: 0 } : c));
+                          // Call backend API to mark as read
+                          try {
+                            const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+                            await fetch(`${BACKEND_URL}/api/chat/${chat.userId}/read`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ reader: 'admin' }),
+                              credentials: 'include'
+                            });
+                          } catch (e) {
+                            console.error(e);
+                          }
+                        }
                       }}
                       className={`w-full text-left p-4 border-b border-gray-100 hover:bg-gray-100 transition-colors ${activeChatId === chat.userId ? 'bg-white border-l-4 border-l-olive' : ''}`}
                     >
@@ -746,11 +918,19 @@ const AdminDashboard = () => {
             <div className="flex-1 flex flex-col bg-white relative">
               {activeChatId ? (
                 <>
-                  <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center gap-x-3">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <h3 className="font-bold text-gray-900">
-                      {chats.find(c => c.userId === activeChatId)?.userName || 'User'}
-                    </h3>
+                  <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                    <div className="flex items-center gap-x-3">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <h3 className="font-bold text-gray-900">
+                        {chats.find(c => c.userId === activeChatId)?.userName || 'User'}
+                      </h3>
+                    </div>
+                    <button 
+                      onClick={() => handleDeleteChat(activeChatId)}
+                      className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors flex items-center gap-x-2 text-sm font-bold"
+                    >
+                      <FiTrash2 className="w-4 h-4" /> Delete Chat
+                    </button>
                   </div>
                   <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     {chats.find(c => c.userId === activeChatId)?.messages.map((msg, idx) => (
@@ -892,6 +1072,89 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Offer Modal */}
+      {showOfferModal && (
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 sticky top-0 z-10">
+              <h2 className="font-black text-xl text-gray-900">{editingOffer ? 'Edit Offer' : 'Add New Offer'}</h2>
+              <button onClick={() => setShowOfferModal(false)} className="text-gray-400 hover:text-gray-900 bg-white p-2 rounded-full shadow-sm">
+                <FiX className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleOfferSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Emoji Icon</label>
+                  <input type="text" value={offerForm.emoji} onChange={e => setOfferForm({ ...offerForm, emoji: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="e.g. 🧢" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Title</label>
+                  <input type="text" value={offerForm.title} onChange={e => setOfferForm({ ...offerForm, title: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="Caps Sale" />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Discount Text</label>
+                  <input type="text" value={offerForm.discount} onChange={e => setOfferForm({ ...offerForm, discount: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="20% OFF" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Original Price</label>
+                  <input type="number" value={offerForm.originalPrice} onChange={e => setOfferForm({ ...offerForm, originalPrice: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="350" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Sale Price</label>
+                  <input type="number" value={offerForm.salePrice} onChange={e => setOfferForm({ ...offerForm, salePrice: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="280" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Description</label>
+                <textarea value={offerForm.desc} onChange={e => setOfferForm({ ...offerForm, desc: e.target.value })} required rows="2" className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="Offer description..."></textarea>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Link Path</label>
+                  <input type="text" value={offerForm.to} onChange={e => setOfferForm({ ...offerForm, to: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="/caps" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Gradient Class (Tailwind)</label>
+                  <input type="text" value={offerForm.gradient} onChange={e => setOfferForm({ ...offerForm, gradient: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="from-sky-500 to-blue-700" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Badge Text</label>
+                  <input type="text" value={offerForm.badge} onChange={e => setOfferForm({ ...offerForm, badge: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="HOT" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Badge Color Class</label>
+                  <input type="text" value={offerForm.badgeColor} onChange={e => setOfferForm({ ...offerForm, badgeColor: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="bg-red-500" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Items (Comma separated)</label>
+                <input type="text" value={offerForm.items} onChange={e => setOfferForm({ ...offerForm, items: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="Lyle & Scott, HUF, Nike" />
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 flex justify-end gap-x-3">
+                <button type="button" onClick={() => setShowOfferModal(false)} className="px-6 py-2.5 font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" className="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-olive transition-colors flex items-center gap-x-2">
+                  <FiCheck /> {editingOffer ? 'Update Offer' : 'Save Offer'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
+import { getOffers } from '../lib/api';
 
 const deals = [
   {
@@ -73,8 +74,23 @@ const useCountdown = () => {
 
 const OfferPage = () => {
   const [hoveredId, setHoveredId] = useState(null);
+  const [activeDeals, setActiveDeals] = useState(deals); // Fallback to hardcoded initially
   const time = useCountdown();
   const pad = n => String(n).padStart(2, '0');
+
+  useEffect(() => {
+    const fetchDynamicOffers = async () => {
+      try {
+        const fetchedOffers = await getOffers();
+        if (fetchedOffers && fetchedOffers.length > 0) {
+          setActiveDeals(fetchedOffers);
+        }
+      } catch (error) {
+        console.error('Failed to load dynamic offers:', error);
+      }
+    };
+    fetchDynamicOffers();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,12 +156,12 @@ const OfferPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {deals.map(deal => (
+          {activeDeals.map(deal => (
             <div
-              key={deal.id}
-              onMouseEnter={() => setHoveredId(deal.id)}
+              key={deal._id || deal.id}
+              onMouseEnter={() => setHoveredId(deal._id || deal.id)}
               onMouseLeave={() => setHoveredId(null)}
-              className={`bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100 transition-all duration-300 ${hoveredId === deal.id ? 'shadow-2xl scale-[1.02] border-transparent' : ''}`}
+              className={`bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100 transition-all duration-300 ${hoveredId === (deal._id || deal.id) ? 'shadow-2xl scale-[1.02] border-transparent' : ''}`}
             >
               {/* Top gradient */}
               <div className={`bg-gradient-to-br ${deal.gradient} p-7 relative overflow-hidden`}>
