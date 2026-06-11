@@ -3,7 +3,7 @@ import { FiMessageCircle, FiX, FiSend } from 'react-icons/fi';
 import { socket } from '../lib/socket';
 import { useSession } from '../lib/auth-client';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const API_BASE = '/api';
 
 const LiveChatWidget = () => {
   const { data: session } = useSession();
@@ -33,7 +33,7 @@ const LiveChatWidget = () => {
 
     const fetchChat = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/api/chat/${userId}`);
+        const response = await fetch(`${API_BASE}/chat/${userId}`);
         const data = await response.json();
         if (data && data.messages) {
           setMessages(data.messages);
@@ -65,7 +65,7 @@ const LiveChatWidget = () => {
   useEffect(() => {
     if (isOpen && unreadCount > 0 && userId) {
       setUnreadCount(0);
-      fetch(`${BACKEND_URL}/api/chat/${userId}/read`, {
+      fetch(`${API_BASE}/chat/${userId}/read`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reader: 'user' })
@@ -87,7 +87,7 @@ const LiveChatWidget = () => {
     setInputText('');
 
     try {
-      await fetch(`${BACKEND_URL}/api/chat/message`, {
+      await fetch(`${API_BASE}/chat/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
