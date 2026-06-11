@@ -33,8 +33,14 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => {
+      if (window.scrollY > 120) {
+        setScrolled(true);
+      } else if (window.scrollY < 20) {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 

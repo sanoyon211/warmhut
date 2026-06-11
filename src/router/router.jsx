@@ -9,8 +9,6 @@ import Checkout from '../pages/Checkout';
 import WishlistPage from '../pages/WishlistPage';
 import Login from '../SignInUp/Login';
 import SignUpPage from '../SignInUp/SignUpPage';
-import Verify from '../SignInUp/Verify';
-import CreateNew from '../SignInUp/CreateNew';
 import Sucessfull from '../SignInUp/Sucessfull';
 import ProtectedRoute from '../components/ProtectedRoute';
 import UserDashboard from '../pages/Dashboard/UserDashboard';
@@ -47,8 +45,6 @@ const router = createBrowserRouter([
       { path: 'wishlist', element: <WishlistPage /> },
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <SignUpPage /> },
-      { path: 'verify', element: <Verify /> },
-      { path: 'create-new', element: <CreateNew /> },
       { path: 'successfull', element: <Sucessfull /> },
       { 
         path: 'dashboard', 

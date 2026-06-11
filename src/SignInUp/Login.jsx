@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     const { data, error } = await signIn.email({
       email: form.email,
       password: form.password,
@@ -58,7 +58,7 @@ const Login = () => {
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-10">
           <div className="text-center mb-8">
-            <h1 className="font-black text-2xl text-gray-900 mb-1">Welcome Back 👋</h1>
+            <h1 className="font-black text-2xl text-gray-900 mb-1">Welcome Back</h1>
             <p className="text-gray-400 text-sm">Sign in to your account</p>
           </div>
 
@@ -102,12 +102,11 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center text-sm">
               <label className="flex items-center gap-x-2 cursor-pointer">
                 <input type="checkbox" className="accent-olive" />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <Link to="/verify" className="text-olive font-semibold hover:underline">Forgot Password?</Link>
             </div>
 
             <button

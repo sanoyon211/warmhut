@@ -69,21 +69,21 @@ const UserDashboard = () => {
 
   const handleDownloadInvoice = (order) => {
     const doc = new jsPDF();
-    
+
     // Header
     doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
     doc.text('WarmHut', 14, 20);
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text('Premium Winter Wear', 14, 26);
-    
+
     // Invoice Info
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('INVOICE', 150, 20);
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Order ID: #${order.orderId.substring(0, 8)}`, 150, 26);
@@ -136,7 +136,7 @@ const UserDashboard = () => {
     doc.setFont('helvetica', 'italic');
     doc.text('Thank you for shopping with WarmHut!', 14, 280);
 
-    doc.save(`Invoice_WarmHut_${order.orderId.substring(0,8)}.pdf`);
+    doc.save(`Invoice_WarmHut_${order.orderId.substring(0, 8)}.pdf`);
   };
 
   if (!session?.user) return null;
@@ -149,7 +149,7 @@ const UserDashboard = () => {
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-olive/20 rounded-full blur-3xl mix-blend-screen"></div>
         <div className="max-w-[1100px] mx-auto relative z-10 text-center">
           <h1 className="text-3xl md:text-4xl font-black text-white mb-3 tracking-tight">
-            Hello, {session.user.name.split(' ')[0]}! 👋
+            Hello, {session.user.name.split(' ')[0]}!
           </h1>
           <p className="text-gray-400 text-sm max-w-lg mx-auto">
             Manage your orders, update your profile settings, and keep track of your shopping journey.
@@ -158,7 +158,7 @@ const UserDashboard = () => {
       </div>
 
       <div className="max-w-[1100px] mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8 -mt-20 relative z-20">
-        
+
         {/* Sidebar */}
         <div className="lg:col-span-4 xl:col-span-3 space-y-6">
           {/* Profile Card */}
@@ -181,7 +181,7 @@ const UserDashboard = () => {
 
           {/* Navigation */}
           <div className="bg-white p-3 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-            <button 
+            <button
               onClick={() => setActiveTab('orders')}
               className={`w-full flex items-center gap-x-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all duration-300 ${activeTab === 'orders' ? 'text-olive bg-olive/10 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
             >
@@ -189,7 +189,7 @@ const UserDashboard = () => {
               My Orders
             </button>
             <div className="h-px w-full bg-gray-50 my-1"></div>
-            <button 
+            <button
               onClick={() => setActiveTab('profile')}
               className={`w-full flex items-center gap-x-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all duration-300 ${activeTab === 'profile' ? 'text-olive bg-olive/10 shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
             >
@@ -197,7 +197,7 @@ const UserDashboard = () => {
               Profile Settings
             </button>
             <div className="h-px w-full bg-gray-50 my-1"></div>
-            <button 
+            <button
               onClick={handleLogout}
               className="w-full flex items-center gap-x-3 px-5 py-4 rounded-2xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all duration-300"
             >
@@ -257,12 +257,12 @@ const UserDashboard = () => {
                               <p className="text-sm font-semibold text-gray-900">#{order.orderId.substring(0, 8).toUpperCase()}</p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-x-3">
                             <span className={`text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm
-                              ${order.status === 'Pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 
-                                order.status === 'Delivered' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 
-                                'bg-blue-100 text-blue-700 border border-blue-200'}`}>
+                              ${order.status === 'Pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
+                                order.status === 'Delivered' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
+                                  'bg-blue-100 text-blue-700 border border-blue-200'}`}>
                               {order.status}
                             </span>
                           </div>
@@ -292,7 +292,7 @@ const UserDashboard = () => {
 
                           {/* Footer / Actions */}
                           <div className="flex items-center justify-end mt-6 pt-6 border-t border-gray-50">
-                            <button 
+                            <button
                               onClick={() => handleDownloadInvoice(order)}
                               className="flex items-center gap-x-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:border-olive hover:text-olive transition-colors shadow-sm group-hover:shadow"
                             >
@@ -364,7 +364,7 @@ const UserDashboard = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="pt-6 border-t border-gray-100 flex justify-end">
                     <button
                       type="submit"

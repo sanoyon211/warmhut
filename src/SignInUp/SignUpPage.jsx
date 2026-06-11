@@ -69,7 +69,7 @@ const SignUpPage = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-10">
           <div className="text-center mb-8">
-            <h1 className="font-black text-2xl text-gray-900 mb-1">Create Account 🚀</h1>
+            <h1 className="font-black text-2xl text-gray-900 mb-1">Create Account </h1>
             <p className="text-gray-400 text-sm">Join WarmHut for exclusive deals</p>
           </div>
 
