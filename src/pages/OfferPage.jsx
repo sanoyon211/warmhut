@@ -165,13 +165,21 @@ const OfferPage = () => {
             >
               {/* Top gradient */}
               <div className={`bg-gradient-to-br ${deal.gradient} p-7 relative overflow-hidden`}>
+                <div className="flex justify-between items-start relative z-10">
+                  <div className="bg-white/20 backdrop-blur-md rounded-2xl p-3 shadow-inner">
+                    {deal.image ? (
+                      <img src={deal.image} alt={deal.title} className="w-16 h-16 object-cover rounded-xl filter drop-shadow-md" />
+                    ) : (
+                      <span className="text-6xl filter drop-shadow-md">{deal.emoji || '🎁'}</span>
+                    )}
+                  </div>
+                  <span className={` ${deal.badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider`}>
+                    {deal.badge}
+                  </span>
+                </div>
                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full" />
                 <div className="absolute -bottom-8 -left-4 w-32 h-32 bg-black/10 rounded-full" />
-                <span className={`absolute top-4 right-4 ${deal.badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider`}>
-                  {deal.badge}
-                </span>
-                <div className="text-5xl mb-3 relative z-10">{deal.emoji}</div>
-                <h3 className="text-white font-black text-2xl relative z-10">{deal.title}</h3>
+                <h3 className="text-white font-black text-2xl relative z-10 mt-4">{deal.title}</h3>
                 <div className="mt-2 inline-block bg-white/20 backdrop-blur-sm text-white text-sm font-bold px-4 py-1 rounded-full relative z-10">
                   {deal.discount}
                 </div>

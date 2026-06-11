@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const offerSchema = new mongoose.Schema({
-  emoji: { type: String, required: true },
+  image: { type: String, required: true },
   title: { type: String, required: true },
   discount: { type: String, required: true },
   originalPrice: { type: Number, required: true },

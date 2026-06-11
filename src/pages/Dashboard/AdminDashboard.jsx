@@ -27,7 +27,8 @@ const AdminDashboard = () => {
   const [showProductModal, setShowProductModal] = useState(false);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [editingOffer, setEditingOffer] = useState(null);
-  const [offerForm, setOfferForm] = useState({ emoji: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: '', badge: '', badgeColor: '', items: '' });
+  const [offerForm, setOfferForm] = useState({ image: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: '', badge: '', badgeColor: '', items: '' });
+  const [offerImageFile, setOfferImageFile] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({ name: '', price: '', category: '', color: '', image: '', stock: '', description: '' });
   const [imageFile, setImageFile] = useState(null);
@@ -304,8 +305,17 @@ const AdminDashboard = () => {
   const handleOfferSubmit = async (e) => {
     e.preventDefault();
     try {
+      let finalImageUrl = offerForm.image;
+      
+      if (offerImageFile) {
+        setUploadingImage(true);
+        finalImageUrl = await uploadImage(offerImageFile);
+        setUploadingImage(false);
+      }
+
       const formattedData = {
         ...offerForm,
+        image: finalImageUrl,
         items: offerForm.items.split(',').map(i => i.trim()),
         originalPrice: Number(offerForm.originalPrice),
         salePrice: Number(offerForm.salePrice)
@@ -321,9 +331,11 @@ const AdminDashboard = () => {
         showToast('Offer created!', 'success');
       }
       setShowOfferModal(false);
-      setOfferForm({ emoji: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: '', badge: '', badgeColor: '', items: '' });
+      setOfferForm({ image: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: '', badge: '', badgeColor: '', items: '' });
+      setOfferImageFile(null);
       setEditingOffer(null);
     } catch (error) {
+      setUploadingImage(false);
       showToast(error.message, 'error');
     }
   };
@@ -345,12 +357,14 @@ const AdminDashboard = () => {
       ...offer,
       items: offer.items.join(', ')
     });
+    setOfferImageFile(null);
     setShowOfferModal(true);
   };
 
   const openOfferAddModal = () => {
     setEditingOffer(null);
-    setOfferForm({ emoji: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: 'from-blue-500 to-indigo-700', badge: 'HOT', badgeColor: 'bg-red-500', items: '' });
+    setOfferForm({ image: '', title: '', discount: '', originalPrice: '', salePrice: '', desc: '', to: '', gradient: 'from-blue-500 to-indigo-700', badge: 'HOT', badgeColor: 'bg-red-500', items: '' });
+    setOfferImageFile(null);
     setShowOfferModal(true);
   };
 
@@ -833,7 +847,9 @@ const AdminDashboard = () => {
                   <tbody className="divide-y divide-gray-100">
                     {offers.map(offer => (
                       <tr key={offer._id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-6 py-4 text-3xl">{offer.emoji}</td>
+                        <td className="px-6 py-4">
+                          <img src={offer.image} alt={offer.title} className="w-12 h-12 object-cover rounded-xl shadow-sm border border-gray-100" />
+                        </td>
                         <td className="px-6 py-4 font-bold text-gray-900">{offer.title}</td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 text-[10px] font-black rounded-full uppercase text-white ${offer.badgeColor}`}>{offer.badge}</span>
@@ -1160,12 +1176,23 @@ const AdminDashboard = () => {
             <form onSubmit={handleOfferSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Emoji Icon</label>
-                  <input type="text" value={offerForm.emoji} onChange={e => setOfferForm({ ...offerForm, emoji: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="e.g. 🧢" />
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Offer Image</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    required={!editingOffer} 
+                    onChange={e => setOfferImageFile(e.target.files[0])} 
+                    className="w-full border rounded-xl px-4 py-2 focus:border-olive outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-olive/10 file:text-olive hover:file:bg-olive/20" 
+                  />
+                  {editingOffer && offerForm.image && !offerImageFile && (
+                    <div className="mt-2 text-sm text-gray-500">
+                      Current: <img src={offerForm.image} alt="Current" className="w-10 h-10 inline-block object-cover rounded-md ml-2" />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Title</label>
-                  <input type="text" value={offerForm.title} onChange={e => setOfferForm({ ...offerForm, title: e.target.value })} required className="w-full border rounded-xl px-4 py-2.5 bg-gray-50 focus:bg-white focus:border-olive outline-none" placeholder="Caps Sale" />
+                  <input type="text" value={offerForm.title} onChange={e => setOfferForm({ ...offerForm, title: e.target.value })} required className="w-full border rounded-xl px-4 py-2 focus:bg-white focus:border-olive outline-none" placeholder="Caps Sale" />
                 </div>
               </div>
               
@@ -1220,8 +1247,9 @@ const AdminDashboard = () => {
                 <button type="button" onClick={() => setShowOfferModal(false)} className="px-6 py-2.5 font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-olive transition-colors flex items-center gap-x-2">
-                  <FiCheck /> {editingOffer ? 'Update Offer' : 'Save Offer'}
+                <button type="submit" disabled={uploadingImage} className="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-olive transition-colors flex items-center gap-x-2 disabled:opacity-50">
+                  {uploadingImage ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <FiCheck />}
+                  {editingOffer ? 'Update Offer' : 'Save Offer'}
                 </button>
               </div>
             </form>
