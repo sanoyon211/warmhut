@@ -2,6 +2,7 @@ import React from 'react';
 import TypedEffect from './TypedEffect';
 import { Link } from 'react-router';
 import { FaArrowRight, FaStar, FaTruck, FaUndo, FaShieldAlt, FaCreditCard } from 'react-icons/fa';
+import { FaSparkles } from 'react-icons/fa6';
 
 const BgImg = () => {
   return (

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaSearch, FaPhone, FaFire, FaTruck, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { GiHamburgerMenu } from 'react-icons/gi';
+import { FaSparkles } from 'react-icons/fa6';
 import { MdAccountCircle, MdClose } from 'react-icons/md';
 import { FiShoppingCart, FiHeart, FiX } from 'react-icons/fi';
 import { Link, useLocation, useNavigate } from 'react-router';
