@@ -2,7 +2,7 @@ import React from 'react';
 import TypedEffect from './TypedEffect';
 import { Link } from 'react-router';
 import { FaArrowRight, FaStar, FaTruck, FaUndo, FaShieldAlt, FaCreditCard } from 'react-icons/fa';
-import { FaSparkles } from 'react-icons/fa6';
+import { HiSparkles } from 'react-icons/hi';
 
 const BgImg = () => {
   return (
@@ -44,7 +44,7 @@ const BgImg = () => {
             </Link>
             <Link to="/offers">
               <button className="flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all duration-300 backdrop-blur-md text-sm md:text-base">
-                <FaSparkles className="text-yellow-400" /> View Hot Offers
+                <HiSparkles className="text-yellow-400" /> View Hot Offers
               </button>
             </Link>
           </div>

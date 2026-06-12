@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaSearch, FaPhone, FaFire, FaTruck, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import { FaSparkles } from 'react-icons/fa6';
+import { HiSparkles } from 'react-icons/hi';
 import { MdAccountCircle, MdClose } from 'react-icons/md';
 import { FiShoppingCart, FiHeart, FiX } from 'react-icons/fi';
 import { Link, useLocation, useNavigate } from 'react-router';
@@ -448,7 +448,7 @@ const Navbar = () => {
                       <div
                         className={`px-3 py-3 rounded-xl text-sm font-black flex items-center gap-x-3 transition-all ${isActive('/signup') ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-olive bg-olive/5'}`}
                       >
-                        <span><FaSparkles /></span> Sign Up
+                        <span><HiSparkles /></span> Sign Up
                       </div>
                     </Link>
                   </>
