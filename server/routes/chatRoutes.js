@@ -24,8 +24,7 @@ router.get('/:userId', async (req, res) => {
   try {
     let chat = await Chat.findOne({ userId: req.params.userId });
     if (!chat) {
-      chat = new Chat({ userId: req.params.userId });
-      await chat.save();
+      return res.json({ messages: [], unreadByUser: 0, unreadByAdmin: 0 });
     }
     res.json(chat);
   } catch (error) {

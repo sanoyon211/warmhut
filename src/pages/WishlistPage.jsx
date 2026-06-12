@@ -15,17 +15,17 @@ const WishlistPage = () => {
 
   const handleRemove = item => {
     toggleWishlist(item);
-    showToast('💔 Removed from wishlist', 'error');
+    showToast(' Removed from wishlist', 'error');
   };
 
   const handleAddToCart = item => {
     addToCart(item);
-    showToast(`🛒 ${item.name} added to cart!`);
+    showToast(` ${item.name} added to cart!`);
   };
 
   const handleMoveAllToCart = () => {
     wishlist.forEach(item => addToCart(item));
-    showToast(`🛒 All ${wishlist.length} items added to cart!`);
+    showToast(` All ${wishlist.length} items added to cart!`);
   };
 
   // Empty state

@@ -51,7 +51,7 @@ const AdminDashboard = () => {
       setMessages(messagesData);
       setProducts(productsData.products || []);
       setPromos(promosData);
-      setChats(chatsData);
+      setChats(chatsData.filter(chat => chat.messages && chat.messages.length > 0));
       setOffers(offersData);
       setLoading(false);
     };
@@ -881,10 +881,10 @@ const AdminDashboard = () => {
 
         {/* Live Chat Tab */}
         {activeTab === 'live_chat' && (
-          <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 overflow-hidden flex h-[700px] max-h-[85vh]">
+          <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-300 overflow-hidden flex h-[700px] max-h-[85vh]">
             {/* Chat List Sidebar */}
-            <div className="w-1/3 border-r border-gray-100 flex flex-col bg-gray-50/50 z-10 relative">
-              <div className="p-5 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-20">
+            <div className="w-1/3 border-r border-gray-300 flex flex-col bg-gray-50/50 z-10 relative">
+              <div className="p-5 border-b border-gray-300 bg-white/80 backdrop-blur-md sticky top-0 z-20">
                 <h3 className="font-black text-gray-900 flex items-center gap-x-2">
                   <FiMessageSquare className="text-olive" /> Active Conversations
                 </h3>
@@ -918,10 +918,10 @@ const AdminDashboard = () => {
                           }
                         }
                       }}
-                      className={`w-full text-left p-3 rounded-2xl transition-all duration-200 flex items-center gap-x-3 ${
+                      className={`w-full text-left p-3 rounded-2xl transition-all duration-200 flex items-center gap-x-3 mb-1 ${
                         activeChatId === chat.userId 
-                          ? 'bg-white shadow-sm ring-1 ring-gray-100' 
-                          : 'hover:bg-gray-100/80 border border-transparent'
+                          ? 'bg-white shadow-sm ring-1 ring-gray-300' 
+                          : 'hover:bg-gray-100/80 border border-gray-200'
                       }`}
                     >
                       <div className="relative">
@@ -966,7 +966,7 @@ const AdminDashboard = () => {
               {activeChatId ? (
                 <>
                   {/* Chat Header */}
-                  <div className="p-4 border-b border-gray-100 bg-white/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-20 shadow-sm">
+                  <div className="p-4 border-b border-gray-300 bg-white/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-20 shadow-sm">
                     <div className="flex items-center gap-x-3">
                       <div className="relative">
                         <div className="w-10 h-10 bg-olive text-white rounded-full flex items-center justify-center font-black shadow-sm">
@@ -1005,7 +1005,7 @@ const AdminDashboard = () => {
                           <div className={`max-w-[75%] px-5 py-3 text-sm shadow-sm relative group ${
                             isAdmin 
                               ? 'bg-olive text-white rounded-2xl rounded-tr-sm' 
-                              : 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm'
+                              : 'bg-white border border-gray-300 text-gray-800 rounded-2xl rounded-tl-sm'
                           }`}>
                             <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                             <span className={`text-[9px] font-bold uppercase tracking-wider flex items-center gap-x-1 mt-2 justify-end ${
@@ -1022,8 +1022,8 @@ const AdminDashboard = () => {
                   </div>
 
                   {/* Input Area */}
-                  <form onSubmit={handleSendReply} className="p-4 bg-white/90 backdrop-blur-md border-t border-gray-100 relative z-20">
-                    <div className="flex items-center gap-x-2 bg-gray-50 border border-gray-200 p-1.5 rounded-full focus-within:border-olive focus-within:ring-2 focus-within:ring-olive/20 transition-all shadow-inner">
+                  <form onSubmit={handleSendReply} className="p-4 bg-white/90 backdrop-blur-md border-t border-gray-300 relative z-20">
+                    <div className="flex items-center gap-x-2 bg-gray-50 border border-gray-300 p-1.5 rounded-full focus-within:border-olive focus-within:ring-2 focus-within:ring-olive/20 transition-all shadow-inner">
                       <input 
                         type="text" 
                         value={chatInput} 

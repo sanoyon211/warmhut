@@ -88,11 +88,10 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center gap-4 text-center px-4">
-        <span className="text-6xl">😕</span>
         <h2 className="text-xl font-bold text-gray-800">Product not found!</h2>
         <p className="text-gray-400 text-sm">Please go back and select a product.</p>
         <button onClick={() => navigate(-1)} className="px-6 py-3 bg-olive text-white rounded-2xl font-bold text-sm hover:bg-gray-900 transition-colors">
-          ← Go Back
+          Go Back
         </button>
       </div>
     );
@@ -109,7 +108,7 @@ const ProductDetail = () => {
       addToCart({ id: product.id, name: product.name, price: product.price, image: product.image });
     }
     setAddedToCart(true);
-    showToast(`🛒 ${product.name} added to cart!`);
+    showToast(` ${product.name} added to cart!`);
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
@@ -120,12 +119,12 @@ const ProductDetail = () => {
 
   const handleWishlist = () => {
     toggleWishlist({ id: product.id, name: product.name, price: product.price, image: product.image });
-    showToast(wishlisted ? '💔 Removed from wishlist' : '❤️ Added to wishlist', wishlisted ? 'error' : 'success');
+    showToast(wishlisted ? ' Removed from wishlist' : ' Added to wishlist', wishlisted ? 'error' : 'success');
   };
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
-    showToast('🔗 Link copied to clipboard!', 'info');
+    showToast(' Link copied to clipboard!', 'info');
   };
 
   const handleReviewSubmit = async (e) => {
@@ -153,7 +152,7 @@ const ProductDetail = () => {
   };
 
   const reviews = product?.reviews || [];
-  const averageRating = reviews.length 
+  const averageRating = reviews.length
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : 0;
 
@@ -248,7 +247,7 @@ const ProductDetail = () => {
               {/* Rating */}
               <div className="flex items-center gap-x-2 mb-4">
                 <div className="flex items-center gap-x-0.5">
-                  {[1,2,3,4,5].map(i => (
+                  {[1, 2, 3, 4, 5].map(i => (
                     <BsStarFill key={i} className={`w-3.5 h-3.5 ${i <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-200'}`} />
                   ))}
                 </div>
@@ -418,7 +417,7 @@ const ProductDetail = () => {
                     { label: 'Price', value: `BDT ${product.price}TK` },
                     { label: 'Material', value: '100% Premium Cotton' },
                     { label: 'Brand', value: 'WarmHut Collection' },
-                    { label: 'Availability', value: 'In Stock ✅' },
+                    { label: 'Availability', value: 'In Stock' },
                     { label: 'Delivery', value: 'Nationwide Bangladesh' },
                   ].map(item => (
                     <div key={item.label} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
@@ -457,12 +456,12 @@ const ProductDetail = () => {
                 <div className="text-center">
                   <p className="text-5xl font-black text-gray-900">{averageRating > 0 ? averageRating : '0.0'}</p>
                   <div className="flex gap-x-0.5 justify-center mt-1">
-                    {[1,2,3,4,5].map(i => <BsStarFill key={i} className={`w-3 h-3 ${i <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-200'}`} />)}
+                    {[1, 2, 3, 4, 5].map(i => <BsStarFill key={i} className={`w-3 h-3 ${i <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-200'}`} />)}
                   </div>
                   <p className="text-xs text-gray-400 mt-1">{reviews.length} reviews</p>
                 </div>
                 <div className="flex-1 space-y-1.5 hidden sm:block">
-                  {[5,4,3,2,1].map(star => {
+                  {[5, 4, 3, 2, 1].map(star => {
                     const count = reviews.filter(r => Math.round(r.rating) === star).length;
                     const percent = reviews.length ? (count / reviews.length) * 100 : 0;
                     return (
@@ -495,7 +494,7 @@ const ProductDetail = () => {
                         <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</span>
                       </div>
                       <div className="flex gap-x-0.5 my-1">
-                        {[1,2,3,4,5].map(i => (
+                        {[1, 2, 3, 4, 5].map(i => (
                           <BsStarFill key={i} className={`w-3 h-3 ${i <= r.rating ? 'text-yellow-400' : 'text-gray-200'}`} />
                         ))}
                       </div>
@@ -504,7 +503,7 @@ const ProductDetail = () => {
                   </div>
                 </div>
               ))}
-              
+
               {/* Add Review Form */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm mt-6">
                 <h3 className="font-black text-gray-900 mb-4">Write a Review</h3>

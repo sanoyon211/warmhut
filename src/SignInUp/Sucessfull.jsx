@@ -9,9 +9,9 @@ const Sucessfull = () => {
   return (
     <section className="min-h-[85vh] flex items-center justify-center bg-gray-50 px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-10 text-center">
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-2 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <span className="text-3xl">✅</span>
+            <span className="text-3xl"></span>
           </div>
           <h1 className="font-black text-2xl text-gray-900 mb-2">Account Created Successfully!</h1>
           <p className="text-gray-400 text-sm mb-8">Your account has been created successfully. You can now log in with your new account.</p>

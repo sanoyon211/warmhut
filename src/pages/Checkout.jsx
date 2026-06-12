@@ -140,6 +140,8 @@ const Checkout = () => {
 
       setOrderId(result.orderId);
       setStep(2);
+      window.scrollTo(0, 0);
+      showToast('Order placed successfully!', 'success');
       if (!directProduct) clearCart();
     } catch (error) {
       showToast('❌ Failed to place order. Please try again.', 'error');
