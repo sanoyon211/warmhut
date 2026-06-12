@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { FaArrowRight } from 'react-icons/fa';
 
 const SectionHeader = ({ title, subtitle, viewAllLink }) => (
   <div className="flex items-end justify-between mb-8 px-1">
@@ -13,7 +14,7 @@ const SectionHeader = ({ title, subtitle, viewAllLink }) => (
     {viewAllLink && (
       <Link to={viewAllLink}>
         <button className="text-xs font-bold text-gray-900 hover:text-white bg-gray-100 hover:bg-olive transition-all duration-300 px-5 py-2.5 rounded-full flex items-center gap-x-2 group">
-          View All <span className="group-hover:translate-x-1 transition-transform">→</span>
+          View All <span className="group-hover:translate-x-1 transition-transform flex items-center"><FaArrowRight /></span>
         </button>
       </Link>
     )}

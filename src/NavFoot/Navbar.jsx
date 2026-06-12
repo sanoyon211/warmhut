@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FaSearch, FaPhone } from 'react-icons/fa';
+import { FaSearch, FaPhone, FaFire, FaTruck, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { MdAccountCircle, MdClose } from 'react-icons/md';
 import { FiShoppingCart, FiHeart, FiX } from 'react-icons/fi';
@@ -79,7 +79,7 @@ const Navbar = () => {
 
   const mainNavLinks = [
     { to: '/shop', label: 'Shop All' },
-    { to: '/offers', label: '🔥 Offers', special: true },
+    { to: '/offers', label: <span className="flex items-center gap-1"><FaFire /> Offers</span>, special: true },
   ];
 
   const categoryLinks = categories.map(c => ({
@@ -90,7 +90,7 @@ const Navbar = () => {
   const mobileNavLinks = [
     { to: '/shop', label: 'Shop All' },
     ...categoryLinks,
-    { to: '/offers', label: '🔥 Offers', special: true },
+    { to: '/offers', label: <span className="flex items-center gap-1"><FaFire /> Offers</span>, special: true },
   ];
 
   return (
@@ -105,9 +105,9 @@ const Navbar = () => {
           className={`hidden md:block bg-gray-900 overflow-hidden transition-all duration-500 ${scrolled ? 'max-h-0' : 'max-h-10 py-1.5'}`}
         >
           <div className="px-4 text-center">
-            <p className="text-xs text-gray-400 tracking-wide">
-              🚚 Free delivery above BDT 1000&nbsp;&nbsp;·&nbsp;&nbsp; 🔥 New
-              arrivals every week&nbsp;&nbsp;·&nbsp;&nbsp; 📞 01715825331
+            <p className="text-xs text-gray-400 tracking-wide flex items-center justify-center gap-2">
+              <FaTruck /> Free delivery above BDT 1000&nbsp;&nbsp;·&nbsp;&nbsp; <FaFire /> New
+              arrivals every week&nbsp;&nbsp;·&nbsp;&nbsp; <FaPhoneAlt /> 01715825331
             </p>
           </div>
         </div>
@@ -447,7 +447,7 @@ const Navbar = () => {
                       <div
                         className={`px-3 py-3 rounded-xl text-sm font-black flex items-center gap-x-3 transition-all ${isActive('/signup') ? 'bg-olive text-white shadow-lg shadow-olive/20' : 'text-olive bg-olive/5'}`}
                       >
-                        <span>✦</span> Sign Up
+                        <span><FaSparkles /></span> Sign Up
                       </div>
                     </Link>
                   </>

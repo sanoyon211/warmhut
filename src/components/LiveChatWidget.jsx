@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiMessageCircle, FiX, FiSend } from 'react-icons/fi';
+import { MdWavingHand } from 'react-icons/md';
 import { socket } from '../lib/socket';
 import { useSession } from '../lib/auth-client';
 
@@ -134,7 +135,7 @@ const LiveChatWidget = () => {
           <div className="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col gap-y-3">
             {messages.length === 0 ? (
               <div className="text-center text-gray-400 my-auto text-sm">
-                <p>👋 Hi there!</p>
+                <p className="flex items-center justify-center gap-2"><MdWavingHand className="text-yellow-500" /> Hi there!</p>
                 <p>How can we help you today?</p>
               </div>
             ) : (

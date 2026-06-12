@@ -5,7 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { useWishlist } from '../context/WishlistContext';
 import { FiShoppingCart, FiHeart } from 'react-icons/fi';
 import { AiFillHeart } from 'react-icons/ai';
-import { BsStarFill } from 'react-icons/bs';
+import { BsStarFill, BsCartCheck, BsHeartbreak } from 'react-icons/bs';
 
 const Card = ({ bgImg, title, subTitle, id, category }) => {
   const navigate = useNavigate();
@@ -28,13 +28,13 @@ const Card = ({ bgImg, title, subTitle, id, category }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addToCart({ id: itemId, name: subTitle, price, image: bgImg });
-    showToast(`🛒 ${subTitle.trim()} added to cart!`);
+    showToast(<span className="flex items-center gap-2"><BsCartCheck /> {subTitle.trim()} added to cart!</span>);
   };
 
   const handleWishlist = (e) => {
     e.stopPropagation();
     toggleWishlist({ id: itemId, name: subTitle, price, image: bgImg });
-    showToast(wishlisted ? '💔 Removed from wishlist' : '❤️ Added to wishlist', wishlisted ? 'error' : 'success');
+    showToast(wishlisted ? <span className="flex items-center gap-2"><BsHeartbreak /> Removed from wishlist</span> : <span className="flex items-center gap-2"><AiFillHeart /> Added to wishlist</span>, wishlisted ? 'error' : 'success');
   };
 
   const rating = (((itemId.charCodeAt(0) % 10) / 10) + 4).toFixed(1);

@@ -11,6 +11,7 @@ import { AiFillHeart } from 'react-icons/ai';
 import { FiHeart, FiShoppingCart, FiArrowLeft, FiShare2, FiCheck, FiUser } from 'react-icons/fi';
 import { BsStarFill, BsStarHalf, BsStar, BsShieldCheck, BsTruck, BsArrowRepeat } from 'react-icons/bs';
 import { HiMinus, HiPlus } from 'react-icons/hi';
+import { FaSearchPlus, FaEye, FaBolt, FaWater, FaBan, FaSun, FaFire, FaStar, FaBox } from 'react-icons/fa';
 
 const ProductDetail = () => {
   const location = useLocation();
@@ -198,7 +199,7 @@ const ProductDetail = () => {
               {/* Zoom hint */}
               {!zoomed && (
                 <div className="absolute bottom-4 right-4 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm">
-                  🔍 Click to zoom
+                  <span className="flex items-center gap-1"><FaSearchPlus /> Click to zoom</span>
                 </div>
               )}
               {/* Wishlist on image */}
@@ -240,7 +241,7 @@ const ProductDetail = () => {
 
               {viewersCount > 1 && (
                 <div className="inline-flex items-center gap-x-2 bg-blue-50 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full mb-3 animate-pulse">
-                  👀 {viewersCount} people are viewing this right now!
+                  <span className="flex items-center gap-1"><FaEye /> {viewersCount} people are viewing this right now!</span>
                 </div>
               )}
 
@@ -338,7 +339,7 @@ const ProductDetail = () => {
                 disabled={product.stock === 0}
                 className="w-full py-4 bg-gray-900 text-white font-black rounded-2xl hover:bg-gray-800 transition-colors text-sm shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {product.stock === 0 ? 'Out of Stock' : '⚡ Buy Now'}
+                {product.stock === 0 ? 'Out of Stock' : <span className="flex items-center justify-center gap-2"><FaBolt /> Buy Now</span>}
               </button>
               <button
                 onClick={handleAddToCart}
@@ -432,12 +433,12 @@ const ProductDetail = () => {
                 <h3 className="font-black text-gray-900 mb-4">Care Instructions</h3>
                 <div className="space-y-3">
                   {[
-                    { icon: '🌊', text: 'Machine wash cold (30°C)' },
-                    { icon: '🚫', text: 'Do not bleach' },
-                    { icon: '☀️', text: 'Dry in shade, not direct sunlight' },
-                    { icon: '♨️', text: 'Iron on low heat' },
-                    { icon: '✨', text: 'Wash inside out for best results' },
-                    { icon: '📦', text: 'Store in a cool dry place' },
+                    { icon: <FaWater className="text-blue-500" />, text: 'Machine wash cold (30°C)' },
+                    { icon: <FaBan className="text-red-500" />, text: 'Do not bleach' },
+                    { icon: <FaSun className="text-yellow-500" />, text: 'Dry in shade, not direct sunlight' },
+                    { icon: <FaFire className="text-orange-500" />, text: 'Iron on low heat' },
+                    { icon: <FaStar className="text-yellow-400" />, text: 'Wash inside out for best results' },
+                    { icon: <FaBox className="text-amber-700" />, text: 'Store in a cool dry place' },
                   ].map(c => (
                     <div key={c.text} className="flex items-center gap-x-3">
                       <span className="text-lg">{c.icon}</span>

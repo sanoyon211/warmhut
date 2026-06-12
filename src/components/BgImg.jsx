@@ -1,6 +1,7 @@
 import React from 'react';
 import TypedEffect from './TypedEffect';
 import { Link } from 'react-router';
+import { FaArrowRight, FaStar, FaTruck, FaUndo, FaShieldAlt, FaCreditCard } from 'react-icons/fa';
 
 const BgImg = () => {
   return (
@@ -37,12 +38,12 @@ const BgImg = () => {
             <Link to="/caps">
               <button className="group relative px-8 py-4 bg-olive text-white font-black rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(75,83,32,0.4)] hover:shadow-[0_0_60px_rgba(75,83,32,0.6)] transition-all duration-300">
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                <span className="relative z-10 flex items-center gap-x-2 text-sm md:text-base tracking-wide">Explore Collection →</span>
+                <span className="relative z-10 flex items-center gap-x-2 text-sm md:text-base tracking-wide">Explore Collection <FaArrowRight /></span>
               </button>
             </Link>
             <Link to="/offers">
-              <button className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all duration-300 backdrop-blur-md text-sm md:text-base">
-                ✨ View Hot Offers
+              <button className="flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all duration-300 backdrop-blur-md text-sm md:text-base">
+                <FaSparkles className="text-yellow-400" /> View Hot Offers
               </button>
             </Link>
           </div>
@@ -53,9 +54,9 @@ const BgImg = () => {
               { num: '500+', label: 'Premium Items' },
               { num: '10K+', label: 'Happy Customers' },
               { num: '100%', label: 'Authentic' },
-              { num: '⭐ 4.9', label: 'Average Rating' },
-            ].map(s => (
-              <div key={s.label} className="text-center group">
+              { num: <span className="flex items-center justify-center gap-1"><FaStar className="text-yellow-400" /> 4.9</span>, label: 'Average Rating' },
+            ].map((s, index) => (
+              <div key={index} className="text-center group">
                 <p className="text-white font-black text-xl md:text-3xl group-hover:text-olive transition-colors">{s.num}</p>
                 <p className="text-gray-500 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-1">{s.label}</p>
               </div>
@@ -67,10 +68,10 @@ const BgImg = () => {
       {/* Feature badges */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {[
-          { icon: '🚚', title: 'Free Premium Delivery', sub: 'On orders above 1000TK' },
-          { icon: '🔄', title: 'Hassle-Free Returns', sub: '7 days no-questions policy' },
-          { icon: '🛡️', title: '100% Authentic', sub: 'Guaranteed original products' },
-          { icon: '💳', title: 'Secure Payment', sub: 'bKash, Cards & Cash on Delivery' },
+          { icon: <FaTruck />, title: 'Free Premium Delivery', sub: 'On orders above 1000TK' },
+          { icon: <FaUndo />, title: 'Hassle-Free Returns', sub: '7 days no-questions policy' },
+          { icon: <FaShieldAlt />, title: '100% Authentic', sub: 'Guaranteed original products' },
+          { icon: <FaCreditCard />, title: 'Secure Payment', sub: 'bKash, Cards & Cash on Delivery' },
         ].map(badge => (
           <div key={badge.title} className="group flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-x-4 bg-white border border-gray-100/60 rounded-3xl px-6 py-5 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-xl hover:border-olive/20 transition-all duration-300 cursor-pointer">
             <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-olive/5 transition-all duration-300 mb-3 sm:mb-0">

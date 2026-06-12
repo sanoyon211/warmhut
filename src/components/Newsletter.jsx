@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useToast } from '../context/ToastContext';
+import { FaEnvelope, FaArrowRight, FaCheckCircle } from 'react-icons/fa';
 
 const Newsletter = () => {
   const [email, setEmail] = useState('');
@@ -8,7 +9,7 @@ const Newsletter = () => {
   const handleSubmit = e => {
     e.preventDefault();
     if (!email) return;
-    showToast('🎉 Successfully subscribed to WarmHut!');
+    showToast(<span className="flex items-center gap-2"><FaCheckCircle /> Successfully subscribed to WarmHut!</span>);
     setEmail('');
   };
 
@@ -21,7 +22,7 @@ const Newsletter = () => {
             <div className="absolute -bottom-10 -right-10 w-60 h-60 rounded-full bg-olive/10 blur-3xl" />
           </div>
           <div className="relative z-10">
-            <span className="text-4xl block mb-4">📧</span>
+            <span className="text-4xl flex justify-center mb-4"><FaEnvelope className="text-gray-400" /></span>
             <h2 className="text-2xl md:text-3xl font-black text-white mb-2">
               Get Exclusive <span className="text-olive">Deals</span>
             </h2>
@@ -37,8 +38,8 @@ const Newsletter = () => {
                 className="flex-1 px-5 py-3.5 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-olive transition-colors text-sm backdrop-blur-sm"
                 required
               />
-              <button type="submit" className="px-6 py-3.5 bg-olive text-white font-bold rounded-2xl hover:bg-white hover:text-gray-900 transition-all duration-200 text-sm whitespace-nowrap shadow-lg">
-                Subscribe →
+              <button type="submit" className="px-6 py-3.5 bg-olive text-white font-bold rounded-2xl hover:bg-white hover:text-gray-900 transition-all duration-200 text-sm whitespace-nowrap shadow-lg flex items-center gap-2">
+                Subscribe <FaArrowRight />
               </button>
             </form>
             <p className="text-gray-600 text-xs mt-4">No spam. Unsubscribe anytime.</p>

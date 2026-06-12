@@ -6,6 +6,7 @@ import { useToast } from '../context/ToastContext';
 import { AiFillHeart } from 'react-icons/ai';
 import { FiShoppingCart, FiTrash2, FiArrowLeft } from 'react-icons/fi';
 import { BsStarFill } from 'react-icons/bs';
+import { FaArrowRight } from 'react-icons/fa';
 
 const WishlistPage = () => {
   const { wishlist, toggleWishlist } = useWishlist();
@@ -44,7 +45,7 @@ const WishlistPage = () => {
         </p>
         <Link to="/">
           <button className="px-8 py-3.5 bg-olive text-white font-bold rounded-2xl hover:bg-gray-900 transition-colors text-sm shadow-lg shadow-olive/20">
-            Start Shopping →
+            <span className="flex items-center justify-center gap-2">Start Shopping <FaArrowRight /></span>
           </button>
         </Link>
       </div>
@@ -189,7 +190,7 @@ const WishlistPage = () => {
           </p>
           <Link to="/">
             <button className="px-8 py-3 border-2 border-gray-200 text-gray-600 font-bold rounded-2xl hover:border-olive hover:text-olive transition-colors text-sm">
-              Continue Shopping →
+              <span className="flex items-center justify-center gap-2">Continue Shopping <FaArrowRight /></span>
             </button>
           </Link>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { IoLogoYoutube } from 'react-icons/io5';
-import { FaFacebook, FaInstagram, FaTiktok } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaTiktok, FaCheckCircle, FaArrowRight, FaTruck, FaUndo, FaShieldAlt, FaCreditCard } from 'react-icons/fa';
 import { Link } from 'react-router';
 import { useToast } from '../context/ToastContext';
 import { subscribeNewsletter } from '../lib/api';
@@ -16,7 +16,7 @@ const Footer = () => {
     setSubscribing(true);
     try {
       const data = await subscribeNewsletter(email);
-      showToast(data.message || '🎉 Successfully subscribed!', 'success');
+      showToast(<span className="flex items-center gap-2"><FaCheckCircle /> {data.message || 'Successfully subscribed!'}</span>, 'success');
       setEmail('');
     } catch (error) {
       showToast(error.message || 'Failed to subscribe. Maybe you are already subscribed?', 'error');
@@ -103,7 +103,7 @@ const Footer = () => {
                     required
                   />
                   <button type="submit" disabled={subscribing} className="w-full py-2.5 bg-olive text-white rounded-xl text-sm font-semibold hover:bg-olive/80 transition-colors disabled:opacity-50">
-                    {subscribing ? 'Subscribing...' : 'Subscribe →'}
+                    {subscribing ? 'Subscribing...' : <span className="flex items-center justify-center gap-2">Subscribe <FaArrowRight /></span>}
                   </button>
                 </div>
               </form>
@@ -116,10 +116,10 @@ const Footer = () => {
           <div className="max-w-[1400px] mx-auto px-6 py-5">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: '🚚', title: 'Free Delivery', sub: 'Above BDT 1000' },
-                { icon: '🔄', title: 'Easy Return', sub: '7 days policy' },
-                { icon: '🛡️', title: '100% Original', sub: 'Authentic products' },
-                { icon: '💳', title: 'bKash & COD', sub: 'Secure payment' },
+                { icon: <FaTruck />, title: 'Free Delivery', sub: 'Above BDT 1000' },
+                { icon: <FaUndo />, title: 'Easy Return', sub: '7 days policy' },
+                { icon: <FaShieldAlt />, title: '100% Original', sub: 'Authentic products' },
+                { icon: <FaCreditCard />, title: 'bKash & COD', sub: 'Secure payment' },
               ].map(f => (
                 <div key={f.title} className="flex flex-col items-center gap-y-1">
                   <span className="text-xl">{f.icon}</span>

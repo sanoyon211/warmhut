@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { getOffers } from '../lib/api';
+import { FaFire, FaTruck, FaUndo, FaCreditCard, FaShieldAlt, FaGift, FaArrowRight, FaTshirt, FaShoePrints, FaWallet } from 'react-icons/fa';
+import { PiBaseballCapFill } from 'react-icons/pi';
 
 const deals = [
   {
-    id: 1, emoji: '🧢', title: 'Caps Sale', discount: '20% OFF',
+    id: 1, emoji: <PiBaseballCapFill />, title: 'Caps Sale', discount: '20% OFF',
     originalPrice: 350, salePrice: 280,
     desc: 'All premium Lyle & Scott, HUF, Nike, Puma caps on sale!',
     to: '/caps', gradient: 'from-sky-500 to-blue-700',
@@ -12,7 +14,7 @@ const deals = [
     items: ['Lyle & Scott', 'HUF', 'Nike', 'Puma', 'Tommy Hilfiger'],
   },
   {
-    id: 2, emoji: '🧥', title: 'Hoodie Bundle', discount: 'BUY 2 GET 1',
+    id: 2, emoji: <FaTshirt />, title: 'Hoodie Bundle', discount: 'BUY 2 GET 1',
     originalPrice: 1400, salePrice: 933,
     desc: 'Buy any 2 hoodies and get 1 absolutely free! Limited time.',
     to: '/hoodie', gradient: 'from-purple-500 to-indigo-700',
@@ -20,7 +22,7 @@ const deals = [
     items: ['Olive', 'Black', 'Baby Blue', 'Cream White'],
   },
   {
-    id: 3, emoji: '👟', title: 'Shoes Clearance', discount: '15% OFF',
+    id: 3, emoji: <FaShoePrints />, title: 'Shoes Clearance', discount: '15% OFF',
     originalPrice: 2200, salePrice: 1870,
     desc: 'Limited stock! Air Force, Air Monarch, Superstar. Grab fast.',
     to: '/shoes', gradient: 'from-emerald-500 to-green-700',
@@ -28,7 +30,7 @@ const deals = [
     items: ['Air Force 107', 'Air Monarch', 'Run Four', 'Superstar II'],
   },
   {
-    id: 4, emoji: '👕', title: 'Sweatshirt Deal', discount: '10% OFF',
+    id: 4, emoji: <FaTshirt />, title: 'Sweatshirt Deal', discount: '10% OFF',
     originalPrice: 750, salePrice: 675,
     desc: 'Premium quality sweatshirts at unbeatable prices this month.',
     to: '/sweatshirt', gradient: 'from-amber-500 to-orange-600',
@@ -36,7 +38,7 @@ const deals = [
     items: ['Jack & Jones', 'Black', 'Gray', 'Light Gray'],
   },
   {
-    id: 5, emoji: '👛', title: 'Wallet Combo', discount: 'FREE SHIPPING',
+    id: 5, emoji: <FaWallet />, title: 'Wallet Combo', discount: 'FREE SHIPPING',
     originalPrice: 500, salePrice: 500,
     desc: 'Free home delivery on all wallet orders across Bangladesh.',
     to: '/wallet', gradient: 'from-rose-500 to-red-700',
@@ -44,7 +46,7 @@ const deals = [
     items: ['Eton & Coin', 'IGOR', 'RE-LOCK', 'TIMILUS', 'Quiksilver'],
   },
   {
-    id: 6, emoji: '🥋', title: 'Dropshoulder Mega', discount: '25% OFF',
+    id: 6, emoji: <FaTshirt />, title: 'Dropshoulder Mega', discount: '25% OFF',
     originalPrice: 1500, salePrice: 1125,
     desc: 'Washed Dropshoulder Hoodies mega sale. All colors available.',
     to: '/dropshoulderhoodie', gradient: 'from-teal-500 to-cyan-700',
@@ -107,7 +109,7 @@ const OfferPage = () => {
 
         <div className="relative z-10 max-w-2xl mx-auto">
           <div className="inline-block bg-red-500 text-white text-xs font-black px-5 py-1.5 rounded-full mb-5 animate-bounce tracking-wider uppercase">
-            🔥 Limited Time Offers
+            <span className="flex items-center justify-center gap-1"><FaFire /> Limited Time Offers</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-3 leading-tight">
             Special <span className="text-olive">Deals</span>
@@ -141,8 +143,13 @@ const OfferPage = () => {
       {/* Perks Strip */}
       <div className="bg-olive">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex flex-wrap justify-center gap-x-8 gap-y-1">
-          {['🚚 Free Delivery above 1000TK', '🔄 7-Day Easy Return', '💳 bKash & Cash on Delivery', '🛡️ 100% Original'].map(s => (
-            <span key={s} className="text-white text-xs font-semibold">{s}</span>
+          {[
+            {icon: <FaTruck />, text: 'Free Delivery above 1000TK'}, 
+            {icon: <FaUndo />, text: '7-Day Easy Return'}, 
+            {icon: <FaCreditCard />, text: 'bKash & Cash on Delivery'}, 
+            {icon: <FaShieldAlt />, text: '100% Original'}
+          ].map(s => (
+            <span key={s.text} className="text-white text-xs font-semibold flex items-center gap-1">{s.icon} {s.text}</span>
           ))}
         </div>
       </div>
@@ -170,7 +177,7 @@ const OfferPage = () => {
                     {deal.image ? (
                       <img src={deal.image} alt={deal.title} className="w-16 h-16 object-cover rounded-xl filter drop-shadow-md" />
                     ) : (
-                      <span className="text-6xl filter drop-shadow-md">{deal.emoji || '🎁'}</span>
+                      <span className="text-6xl filter drop-shadow-md text-white/80 flex items-center justify-center">{deal.emoji || <FaGift />}</span>
                     )}
                   </div>
                   <span className={` ${deal.badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider`}>
@@ -209,7 +216,7 @@ const OfferPage = () => {
 
                 <Link to={deal.to}>
                   <button className={`w-full py-3.5 rounded-2xl font-bold text-sm text-white bg-gradient-to-r ${deal.gradient} hover:opacity-90 transition-opacity shadow-lg`}>
-                    Shop {deal.title} →
+                    <span className="flex items-center justify-center gap-2">Shop {deal.title} <FaArrowRight /></span>
                   </button>
                 </Link>
               </div>
@@ -230,7 +237,7 @@ const OfferPage = () => {
             </p>
             <Link to="/">
               <button className="px-10 py-4 bg-olive text-white font-bold rounded-2xl hover:bg-white hover:text-gray-900 transition-all duration-200 shadow-xl shadow-olive/20 text-sm">
-                Explore All Products →
+                <span className="flex items-center justify-center gap-2">Explore All Products <FaArrowRight /></span>
               </button>
             </Link>
           </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSession, signOut } from '../../lib/auth-client';
 import { getAllOrders, getAllContacts, markContactRead, deleteContact, fetchProducts, createProduct, updateProduct, deleteProduct, updateOrderStatus, getPromos, createPromo, deletePromo, uploadImage, getChatsAdmin, sendChatMessage, deleteChatAdmin, getOffers, createOffer, updateOffer, deleteOffer } from '../../lib/api';
 import { useNavigate, Link } from 'react-router';
-import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu, FiStar, FiSend, FiUser, FiClock } from 'react-icons/fi';
+import { FiShield, FiLogOut, FiUsers, FiBox, FiDollarSign, FiMessageSquare, FiCheck, FiPlus, FiEdit2, FiTrash2, FiX, FiTag, FiHome, FiMenu, FiStar, FiSend, FiUser, FiClock, FiBell, FiMail } from 'react-icons/fi';
 import { useToast } from '../../context/ToastContext';
 import { socket } from '../../lib/socket';
 
@@ -63,7 +63,7 @@ const AdminDashboard = () => {
 
     socket.on('newOrder', (newOrder) => {
       setOrders((prev) => [newOrder, ...prev]);
-      showToast('🔔 New order received!', 'info');
+      showToast(<span className="flex items-center gap-2"><FiBell /> New order received!</span>, 'info');
     });
 
     socket.on('orderStatusUpdated', (updatedOrder) => {
@@ -72,7 +72,7 @@ const AdminDashboard = () => {
 
     socket.on('newMessage', (msg) => {
       setMessages((prev) => [msg, ...prev]);
-      showToast('✉️ New customer message received!', 'info');
+      showToast(<span className="flex items-center gap-2"><FiMail /> New customer message received!</span>, 'info');
     });
 
     socket.on('productCreated', (product) => {
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
           return [newChat, ...prev];
         }
       });
-      showToast('💬 New live support message!', 'info');
+      showToast(<span className="flex items-center gap-2"><FiMessageSquare /> New live support message!</span>, 'info');
     });
 
     return () => {

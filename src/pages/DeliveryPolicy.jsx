@@ -1,4 +1,5 @@
 import React from 'react';
+import { MdCelebration } from 'react-icons/md';
 
 const DeliveryPolicy = () => {
   return (
@@ -28,7 +29,7 @@ const DeliveryPolicy = () => {
                 <p className="text-sm text-gray-600">Delivery Charge: <span className="font-bold text-gray-900">BDT 120</span></p>
               </div>
             </div>
-            <p className="text-sm text-olive font-bold mt-4">🎉 Free Delivery on all orders above BDT 1000!</p>
+            <p className="text-sm text-olive font-bold mt-4 flex items-center gap-2"><MdCelebration className="text-yellow-500" /> Free Delivery on all orders above BDT 1000!</p>
           </section>
 
           <section>

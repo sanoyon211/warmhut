@@ -4,8 +4,10 @@ import { useSession } from '../lib/auth-client';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { createOrder, validatePromo } from '../lib/api';
-import { FiUser, FiPhone, FiMapPin, FiChevronDown, FiCheck, FiTag } from 'react-icons/fi';
+import { FiUser, FiPhone, FiMapPin, FiChevronDown, FiCheck, FiTag, FiAlertTriangle, FiXCircle } from 'react-icons/fi';
 import { BsTruck, BsCashCoin } from 'react-icons/bs';
+import { MdCelebration } from 'react-icons/md';
+import { FaCheckCircle, FaLock } from 'react-icons/fa';
 
 
 const Checkout = () => {
@@ -98,11 +100,11 @@ const Checkout = () => {
   const handleOrder = async (e) => {
     e.preventDefault();
     if (!form.name || !form.phone || !form.address || !form.area) {
-      showToast('⚠️ Please fill all required fields!', 'error');
+      showToast(<span className="flex items-center gap-2"><FiAlertTriangle /> Please fill all required fields!</span>, 'error');
       return;
     }
     if (payMethod === 'bkash' && !bKashTrxId.trim()) {
-      showToast('⚠️ Please enter the bKash Transaction ID!', 'error');
+      showToast(<span className="flex items-center gap-2"><FiAlertTriangle /> Please enter the bKash Transaction ID!</span>, 'error');
       return;
     }
     setPlacing(true);
@@ -144,7 +146,7 @@ const Checkout = () => {
       showToast('Order placed successfully!', 'success');
       if (!directProduct) clearCart();
     } catch (error) {
-      showToast('❌ Failed to place order. Please try again.', 'error');
+      showToast(<span className="flex items-center gap-2"><FiXCircle /> Failed to place order. Please try again.</span>, 'error');
     } finally {
       setPlacing(false);
     }
@@ -158,7 +160,7 @@ const Checkout = () => {
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
             <FiCheck className="w-10 h-10 text-green-500" />
           </div>
-          <h1 className="font-black text-2xl text-gray-900 mb-2">Order Placed! 🎉</h1>
+          <h1 className="font-black text-2xl text-gray-900 mb-2 flex justify-center items-center gap-2">Order Placed! <MdCelebration className="text-yellow-500" /></h1>
           <p className="text-gray-400 text-sm mb-1">Your order has been confirmed.</p>
           <p className="text-olive font-black text-lg mb-6">Order ID: {orderId}</p>
 
@@ -410,7 +412,7 @@ const Checkout = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Delivery</span>
                   <span className={`font-semibold ${delivery === 0 ? 'text-green-500' : 'text-gray-800'}`}>
-                    {delivery === 0 ? 'FREE 🎉' : `BDT ${delivery}TK`}
+                    {delivery === 0 ? <span className="flex items-center gap-1">FREE <MdCelebration className="text-yellow-500" /></span> : `BDT ${delivery}TK`}
                   </span>
                 </div>
               </div>
@@ -457,12 +459,12 @@ const Checkout = () => {
                     Placing Order...
                   </span>
                 ) : (
-                  '✅ Place Order'
+                  <span className="flex items-center justify-center gap-2"><FaCheckCircle /> Place Order</span>
                 )}
               </button>
 
-              <p className="text-center text-xs text-gray-400 mt-3">
-                🔒 Your information is 100% secure
+              <p className="text-center text-xs text-gray-400 mt-3 flex justify-center items-center gap-1">
+                <FaLock className="text-gray-400" /> Your information is 100% secure
               </p>
             </div>
           </div>

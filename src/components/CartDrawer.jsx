@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext';
 import { IoClose, IoTrashOutline } from 'react-icons/io5';
 import { HiMinus, HiPlus } from 'react-icons/hi';
 import { MdShoppingBag } from 'react-icons/md';
+import { FaTruck, FaArrowRight } from 'react-icons/fa';
 import { Link } from 'react-router';
 
 const CartDrawer = () => {
@@ -93,13 +94,13 @@ const CartDrawer = () => {
               <span className="text-olive">BDT {totalPrice >= 1000 ? totalPrice : totalPrice + 60}TK</span>
             </div>
             {totalPrice < 1000 && (
-              <p className="text-xs text-center text-amber-600 bg-amber-50 py-2 rounded-lg">
-                Add BDT {1000 - totalPrice}TK more for FREE delivery! 🚚
+              <p className="text-xs text-center flex items-center justify-center gap-1 text-amber-600 bg-amber-50 py-2 rounded-lg">
+                Add BDT {1000 - totalPrice}TK more for FREE delivery! <FaTruck />
               </p>
             )}
             <Link to="/checkout" onClick={() => setIsCartOpen(false)}>
-              <button className="w-full py-4 bg-olive text-white rounded-2xl font-bold text-sm hover:bg-gray-900 transition-colors duration-200 shadow-lg shadow-olive/20">
-                Proceed to Checkout →
+              <button className="w-full py-4 bg-olive text-white rounded-2xl font-bold text-sm hover:bg-gray-900 transition-colors duration-200 shadow-lg shadow-olive/20 flex items-center justify-center gap-2">
+                Proceed to Checkout <FaArrowRight />
               </button>
             </Link>
             <button onClick={clearCart} className="w-full py-2 text-xs text-gray-400 hover:text-red-400 transition-colors">

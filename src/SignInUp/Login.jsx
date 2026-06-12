@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
+import { FaArrowRight } from 'react-icons/fa';
 import { signIn } from '../lib/auth-client';
 
 const Login = () => {
@@ -114,7 +115,7 @@ const Login = () => {
               disabled={loading}
               className="w-full py-4 bg-olive text-white font-bold rounded-2xl hover:bg-gray-900 disabled:bg-gray-400 transition-colors duration-200 shadow-lg shadow-olive/20 text-sm mt-2 flex justify-center items-center gap-2"
             >
-              {loading ? 'Signing In...' : 'Sign In →'}
+              {loading ? 'Signing In...' : <span className="flex items-center justify-center gap-2">Sign In <FaArrowRight /></span>}
             </button>
           </form>
 
